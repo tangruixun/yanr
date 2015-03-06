@@ -1,5 +1,7 @@
 package com.trx.yanr;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -119,13 +121,19 @@ public class AllGroupListActivity extends Activity {
         if (id == R.id.action_subscribe) {
             SubscribedGroupsDbOperator sgDbOpr = new SubscribedGroupsDbOperator (context);
             sgDbOpr.open ();
+            ArrayList <String> subdGrpList = new ArrayList <String> ();
             String grpName;
             for (int i=0; i<allnewsgroups.size (); i++) {
                 if (selectionArray.get (i) == true) {
                     grpName = allnewsgroups.elementAt (i);
-                    sgDbOpr.subscribeGroup (grpName, servername);
+                    subdGrpList.add (grpName);
                 }
             }
+            int subd_result = sgDbOpr.subscribeGroup (subdGrpList, servername);
+
+            
+            
+            
             finish ();
             return true;
         }

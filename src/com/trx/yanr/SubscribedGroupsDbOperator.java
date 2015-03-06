@@ -1,5 +1,7 @@
 package com.trx.yanr;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -94,6 +96,31 @@ public class SubscribedGroupsDbOperator {
         return cursor;
     }
     
+    private void deleteRecord (String grpName, String serverName) {
+        try {
+            Cursor c = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
+                    DBHelper.S_SG_SVRNAME + " = '" + serverName + "' AND " + DBHelper.S_SG_GRPNAME + " = '" + grpName + "'", 
+                    null, null, null, null);
+            c.moveToFirst ();
+            deleteRecord (c);
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+    }
+    
+    private void deleteRecord (Cursor c) {
+        try {
+            if (c!=null) {
+                if (c.getCount () > 0) {
+                    Long _id = c.getLong (c.getColumnIndex (DBHelper.S_SG_ID));
+                    deleteRecord (_id);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+    }
+    
     public void deleteRecord (Long id) {
         try {
             // long id = record.getId();
@@ -105,7 +132,7 @@ public class SubscribedGroupsDbOperator {
             e.printStackTrace ();
         }
     }
-    
+
     public int clearAllRecords () {
         int deleteRow = 0;
         try {
@@ -116,23 +143,38 @@ public class SubscribedGroupsDbOperator {
         return deleteRow;
     }
 
-    public Cursor subscribeGroup (String grpName, String serverName) {
+    // grpList: all new subscribed groups
+    public int subscribeGroup (ArrayList <String> grpList, String serverName) {
+        ArrayList <String> newAddedGrpList = grpList;
+        ArrayList <String> grpNeedUnsubscribed = new ArrayList <String> ();
         Cursor cursor = null;
-        try {
-            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
-                    DBHelper.S_SG_SVRNAME + " = '" + serverName + "' AND " + DBHelper.S_SG_GRPNAME + " = '" + grpName + "'",
-                    null, null, null, null);
+        try {            
+            cursor = getGroupsByServer (serverName); 
             cursor.moveToFirst ();
             if (cursor.getCount () > 0) {
                 do {
-                    long _id = cursor.getLong (cursor.getColumnIndex (DBHelper.S_SG_ID));
-                    deleteRecord (_id);
-                } while (cursor.moveToNext ());                
+                    String subedGrpName = cursor.getString (cursor.getColumnIndex (DBHelper.S_SG_GRPNAME)); // old subscribed group
+                    if (newAddedGrpList.contains (subedGrpName)) {
+                        // newAddedGroup = all new subscribed groups - remove groups already subscribed
+                        newAddedGrpList.remove (subedGrpName); 
+                    } else {
+                        // add old groups not in the new subscribed group list to the list that groups needed to be removed.
+                        grpNeedUnsubscribed.add (subedGrpName); 
+                    }
+                } while (cursor.moveToNext ());
+                
+                for (String grpName : grpNeedUnsubscribed) {
+                    deleteRecord (grpName, serverName); // unsubscribe groups in db
+                }
+                for (String grpName : newAddedGrpList) {
+                    createRecord (grpName, serverName); // subscribe new groups in db
+                }
+                return 0;
             }
-            cursor = createRecord (grpName, serverName);
         } catch (Exception e) {
             e.printStackTrace();
+            return 1;
         }
-        return cursor;
+        return 2;
     }
 }

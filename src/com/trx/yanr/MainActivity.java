@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -189,10 +191,12 @@ public class MainActivity extends FragmentActivity implements
         private SubscribedGroupsDbOperator sbscrbdGrpDbOper;
         private String serverName;
         private int port;
+        Cursor cursor;
         
         public SubscribedGroupFragment (String serverName, int port) {
             this.serverName = serverName;
             this.port = port;
+            cursor = null;
         }
         
         
@@ -222,7 +226,7 @@ public class MainActivity extends FragmentActivity implements
             
             try {
                 sbscrbdGrpDbOper.open ();
-                Cursor cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
+                cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
                 
                 subdGrpAdptr = new SubscribeGroupCursorListAdapter (getActivity (),
                         cursor, SubscribeGroupCursorListAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -236,22 +240,35 @@ public class MainActivity extends FragmentActivity implements
                 
             }
             
-            //lv.setOnItemClickListener (listener);
+            GroupItemClickListener grpSelectListener = new GroupItemClickListener ();
+            lv.setOnItemClickListener (grpSelectListener);
+            
+
             
         }
-        
 
         @Override
         public void onResume () {
             sbscrbdGrpDbOper.open ();
-            Cursor cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
+            cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
             Cursor newCursor = cursor;
             subdGrpAdptr.changeCursor (newCursor); // automatically closes old Cursor
             subdGrpAdptr.mCursor = newCursor;
             subdGrpAdptr.notifyDataSetChanged ();
             super.onResume ();
         }
+        
+        class GroupItemClickListener implements OnItemClickListener {
+
+            @Override
+            public void onItemClick (AdapterView <?> parent, View view,
+                    int position, long id) {
+                if (cursor != null) {
+                    cursor.moveToPosition (position);
+                    String grpName = cursor.getString (cursor.getColumnIndex (DBHelper.S_SG_GRPNAME));
+                    Log.i ("--->", grpName);
+                }
+            }
+        }
     }
-    
-    
 }
