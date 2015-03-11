@@ -74,7 +74,6 @@ public class AllGroupListActivity extends Activity {
                                 
                                 selectionArray = grpAdptr.getSelectionArray();
                                 
-                                int i = 1+1;
                             }
                         });
                     }

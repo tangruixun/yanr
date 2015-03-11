@@ -156,7 +156,23 @@ public class NNTPClientClass {
 	void displayAllSelectedNewsgroups() throws IOException {
 	    for(int i = 0; i < newsgroups.size(); i++)
 			displayNewsgroup(newsgroups.elementAt(i).toString());
-	}	
+	}
+	
+	void listNewsgroup (String group) throws IOException {
+	    try {
+            int rst = sendCommand("LISTGROUP " + group);
+            if (rst>299) {
+                return;
+            }
+            Log.i("--->", group);
+        } catch (Exception e) {
+            Log.i("--->", e.getMessage());
+            return;
+        }
+	    
+        String tmp = getTextResponse();
+
+	}
 
 	void displayNewsgroup(String group) throws IOException {
 		try {

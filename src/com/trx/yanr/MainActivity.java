@@ -267,6 +267,14 @@ public class MainActivity extends FragmentActivity implements
                     cursor.moveToPosition (position);
                     String grpName = cursor.getString (cursor.getColumnIndex (DBHelper.S_SG_GRPNAME));
                     Log.i ("--->", grpName);
+                    
+                    Intent selGrpIntent = new Intent ();
+                    selGrpIntent.setClass (getActivity (), SingleGroupViewActivity.class);
+                    selGrpIntent.putExtra ("ServerName", serverName);
+                    selGrpIntent.putExtra ("Port", port);
+                    selGrpIntent.putExtra ("GroupName", grpName);
+                    getActivity ().startActivity (selGrpIntent);
+                    
                 }
             }
         }

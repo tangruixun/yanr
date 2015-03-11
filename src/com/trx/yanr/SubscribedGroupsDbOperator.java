@@ -16,10 +16,11 @@ public class SubscribedGroupsDbOperator {
     public String [] allColumns = {
             DBHelper.S_SG_ID, DBHelper.S_SG_GRPNAME, 
             DBHelper.S_SG_SVRNAME, DBHelper.S_SG_READNO, 
-            DBHelper.S_SG_ARTICLENO, DBHelper.S_SG_POSTABLE, 
+            DBHelper.S_SG_ARTICLENO, DBHelper.S_SG_LATESTARTICLENO, DBHelper.S_SG_POSTABLE, 
             DBHelper.S_SG_GRPDES, DBHelper.S_SG_MEMO };
     
     public SubscribedGroupsDbOperator (Context context) {
+        super ();
         subscribedGroupDbHelper = new DBHelper (context);
     }
     
@@ -36,38 +37,40 @@ public class SubscribedGroupsDbOperator {
         String strSrvName = grpData.getServerName ();
         int nReadNo = grpData.getReadNumber ();
         int nArticleNo = grpData.getArticleNumbers ();
+        int nLatestArticleNo = grpData.getLatestArticleNumber ();
         Boolean bPostable = grpData.getPostable ();
         String strGrpDes = grpData.getGroupDes ();
         String strGrpMemo = grpData.getMemo ();
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, bPostable, strGrpDes, strGrpMemo);
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, strGrpDes, strGrpMemo);
     }
     
     public Cursor createRecord (String strGrpName, String strSrvName) {
-        return createRecord (strGrpName, strSrvName, -1, -1);
+        return createRecord (strGrpName, strSrvName, -1, -1, -1);
     }
     
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
-            int nArticleNo) {
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, true);
+            int nArticleNo, int nLatestArticleNo) {
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, true);
     }
     
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
-            int nArticleNo, Boolean bPostable) {
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, bPostable, "");
+            int nArticleNo, int nLatestArticleNo, Boolean bPostable) {
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, "");
     }
     
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
-            int nArticleNo, Boolean bPostable, String strGrpDes) {
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, bPostable, strGrpDes, "");
+            int nArticleNo, int nLatestArticleNo, Boolean bPostable, String strGrpDes) {
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, strGrpDes, "");
     }
 
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
-            int nArticleNo, Boolean bPostable, String strGrpDes, String strGrpMemo) {
+            int nArticleNo, int nLatestArticleNo, Boolean bPostable, String strGrpDes, String strGrpMemo) {
         ContentValues contentValues = new ContentValues ();
         contentValues.put (DBHelper.S_SG_GRPNAME, strGrpName);
         contentValues.put (DBHelper.S_SG_SVRNAME, strSrvName);
         contentValues.put (DBHelper.S_SG_READNO, nReadNo);
         contentValues.put (DBHelper.S_SG_ARTICLENO, nArticleNo);
+        contentValues.put (DBHelper.S_SG_LATESTARTICLENO, nLatestArticleNo);        
         contentValues.put (DBHelper.S_SG_POSTABLE, bPostable);
         contentValues.put (DBHelper.S_SG_MEMO, strGrpMemo);
         

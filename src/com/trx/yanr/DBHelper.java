@@ -17,21 +17,38 @@ public class DBHelper extends SQLiteOpenHelper {
     public final static String S_SG_SVRNAME = "s_ServerName";
     public final static String S_SG_READNO = "s_ReadNumber";
     public final static String S_SG_ARTICLENO = "s_ArticleNumber";
+    public final static String S_SG_LATESTARTICLENO = "s_LatestArticleNumber";
     public final static String S_SG_POSTABLE = "s_Postable";
     public final static String S_SG_GRPDES = "s_GrpDescription";
     public final static String S_SG_MEMO = "s_Memo";
     
-    private final static String createSubscribedGroupTableSQL = "create table "
+    public final static String ARTICLE_NO_TABLE = "ArticleNumber";
+    public final static String S_AN_ID = "_id";
+    public final static String S_AN_GRPNAME = "s_GroupName";
+    public final static String S_AN_SVRNAME = "s_ServerName";
+    public final static String S_AN_ARTICLENO = "s_ArticleNumber";
+    
+    private final static String createArticleNumberTableSQL = "CREATE TABLE "
+            + ARTICLE_NO_TABLE
+            + " ("
+            + S_AN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + S_SG_GRPNAME + " NVARCHAR(256), "
+            + S_SG_SVRNAME + " NVARCHAR(256), "
+            + S_AN_ARTICLENO + " INT"
+            + ")";
+    
+    private final static String createSubscribedGroupTableSQL = "CREATE TABLE "
             + SUBSCRIBED_GROUPS_TABLE
             + " ("
-            + S_SG_ID + " integer primary key autoincrement, "
-            + S_SG_GRPNAME + " nvarchar(256), "
-            + S_SG_SVRNAME + " nvarchar(256), "
-            + S_SG_READNO + " int,"
-            + S_SG_ARTICLENO + " int,"
-            + S_SG_POSTABLE + " int,"
-            + S_SG_GRPDES + " nvarchar(512), "
-            + S_SG_MEMO + " nvarchar(512) "
+            + S_SG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + S_SG_GRPNAME + " NVARCHAR(256), "
+            + S_SG_SVRNAME + " NVARCHAR(256), "
+            + S_SG_READNO + " INT,"
+            + S_SG_ARTICLENO + " INT,"
+            + S_SG_LATESTARTICLENO + " INT,"
+            + S_SG_POSTABLE + " INT,"
+            + S_SG_GRPDES + " NVARCHAR(512), "
+            + S_SG_MEMO + " NVARCHAR(512) "
             + ")";
 
     public DBHelper (Context context, String name, CursorFactory factory,
@@ -51,6 +68,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate (SQLiteDatabase db) {
         Log.i ("--->", "create database");
         db.execSQL (createSubscribedGroupTableSQL);
+        db.execSQL (createArticleNumberTableSQL);
     }
 
     @Override
@@ -60,6 +78,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
         db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
+        db.execSQL ("DROP TABLE IF EXISTS " + ARTICLE_NO_TABLE);
         onCreate (db);
     }
 

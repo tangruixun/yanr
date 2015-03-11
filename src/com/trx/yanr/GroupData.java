@@ -6,6 +6,7 @@ public class GroupData {
     private String serverName;
     private int readNumber; // read number
     private int articleNumbers; // 0000385432 - 0000327369
+    private int latestArticleNumber;
     private Boolean postable; // y
     private String groupDes;
     private String memo;
@@ -32,6 +33,12 @@ public class GroupData {
     }
     public void setArticleNumbers (int articleNumbers) {
         this.articleNumbers = articleNumbers;
+    }
+    public int getLatestArticleNumber () {
+        return latestArticleNumber;
+    }
+    public void setLatestArticleNumber (int latestArticleNumber) {
+        this.latestArticleNumber = latestArticleNumber;
     }
     public Boolean getPostable () {
         return postable;

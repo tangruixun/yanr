@@ -17,4 +17,7 @@
     <string name="title_activity_subscribe">All Groups</string>
     <string name="action_subscribe">Subscribe</string>
     <string name="db_path">/data/data/com.trx.yanr/databases/</string>
+    <string name="title_activity_single_group_view">SingleGroupViewActivity</string>
+    <string name="action_retrieve_articles">Retrieve Articles</string>
+
 </resources>

@@ -8,7 +8,7 @@ import java.util.List;
 import android.util.Log;
 
 public class NewsOpHelper {
-    
+        
     NewsGroups retrieveAllGroups (String servername, int port) throws IOException, Exception {
         NNTPClientClass nntpclient = new NNTPClientClass();
         List<String> messageHeaderList = new ArrayList<String>();
@@ -34,5 +34,28 @@ public class NewsOpHelper {
             throw e;
         }
         return newsgroups;
-    }    
+    }
+    
+    void retrieveArticleNumbers (String servername, int port, String groupname) throws IOException, Exception {
+        NNTPClientClass nntpclient = new NNTPClientClass();
+        try {
+            if (!nntpSocket.isConnected ()) {
+                nntpSocket = nntpclient.connect (servername, port);
+            }
+            nntpclient.displayNewsgroup (groupname);
+            
+            
+            
+            
+            
+            
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

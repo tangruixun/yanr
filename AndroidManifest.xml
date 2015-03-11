@@ -8,7 +8,7 @@
         android:minSdkVersion="17"
         android:targetSdkVersion="21" />
 
-        <uses-feature
+    <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
     <uses-feature
@@ -26,14 +26,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!--
      The following two permissions are not required to use
-     Google Maps Android API v2, but are recommended.
-
-
-
+     Google Maps Android API v2, but are recommended.
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -51,6 +48,10 @@
         <activity
             android:name=".AllGroupListActivity"
             android:label="@string/title_activity_subscribe" >
+        </activity>
+        <activity
+            android:name=".SingleGroupViewActivity"
+            android:label="@string/title_activity_single_group_view" >
         </activity>
     </application>
 
