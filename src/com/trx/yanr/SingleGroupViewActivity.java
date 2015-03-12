@@ -1,6 +1,7 @@
 package com.trx.yanr;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -30,6 +32,8 @@ public class SingleGroupViewActivity extends Activity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.layout_single_group_view);
+        
+        context = this;
         
         bundle = getIntent ().getExtras ();
         svrName = bundle.getString ("ServerName");
@@ -76,7 +80,7 @@ public class SingleGroupViewActivity extends Activity {
     private void getGroupArticleNumbers () {
         mGetArticles_thread = new HandlerThread ("GetGroupArticles");
         mGetArticles_thread.start ();
-        mGetArticles_handler = new Handler (mGetArticles_handler.getLooper ());
+        mGetArticles_handler = new Handler (mGetArticles_thread.getLooper ());
         myGetArticlesRunnable = new GetArticlesRunnable (mUI_handler);
         mGetArticles_handler.post (myGetArticlesRunnable);
     }
@@ -94,7 +98,36 @@ public class SingleGroupViewActivity extends Activity {
             Message msg;
             NewsOpHelper newsOpHelper = new NewsOpHelper ();
             try {
-                newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
+                // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
+                List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
+                ArticleNoDbOperator artlNoDbOptr = new ArticleNoDbOperator (context);
+                artlNoDbOptr.open ();
+                for (SparseArray <NNTPMessageHeader> idHeaderMap : headerList) {
+                    
+                    int articleNo = idHeaderMap.keyAt (0);
+                    if (!artlNoDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
+                        artlNoDbOptr.createRecord (grpName, svrName, articleNo);
+                    }
+                }
+
+//                String [] everyLinesArray = allArticleNumbers.split ("\\r?\\n");
+//                ArticleNoDbOperator artlNoDbOptr = new ArticleNoDbOperator (context);
+//                artlNoDbOptr.open ();
+//                for (String strArticleNo : everyLinesArray) {
+//                    int articleNo = Integer.valueOf (strArticleNo);
+//                    if (!artlNoDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
+//                        artlNoDbOptr.createRecord (grpName, svrName, articleNo);
+//                        
+//
+//                    }
+//                }
+                
+                
+
+                
+                
+                
+                
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception e) {

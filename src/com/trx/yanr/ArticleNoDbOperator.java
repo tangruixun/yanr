@@ -34,7 +34,7 @@ public class ArticleNoDbOperator {
         return createRecord (strGrpName, strSrvName, nArticleNo);
     }
 
-    private Cursor createRecord (String strGrpName, String strSrvName,
+    public Cursor createRecord (String strGrpName, String strSrvName,
             int nArticleNo) {
         ContentValues contentValues = new ContentValues ();
         contentValues.put (DBHelper.S_AN_GRPNAME, strGrpName);
@@ -59,7 +59,7 @@ public class ArticleNoDbOperator {
             String [] selectArg = {groupName, serverName};
             cursor = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, 
                     DBHelper.S_AN_GRPNAME + " = ? AND " + DBHelper.S_AN_SVRNAME + " = ?", 
-                    selectArg, null, null, DBHelper.S_SG_ARTICLENO + " DESC");
+                    selectArg, null, null, DBHelper.S_AN_ARTICLENO + " DESC");
             cursor.moveToFirst ();
         } catch (Exception e) {
             e.printStackTrace ();
@@ -71,7 +71,7 @@ public class ArticleNoDbOperator {
         Cursor c = null;
         try {
             c = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, 
-                    DBHelper.S_SG_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_SG_ARTICLENO + " = " + articleNo,
+                    DBHelper.S_AN_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_AN_ARTICLENO + " = " + articleNo,
                     null, null, null, null);
             c.moveToFirst ();
             deleteRecord (c);
@@ -114,6 +114,30 @@ public class ArticleNoDbOperator {
         }
         return deleteRow;
     }
+
+
+
+    public boolean isNumberExisted (String groupName, String serverName, 
+            int articleNo) {
+        Cursor c = null;
+        try {
+            c = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, 
+                    DBHelper.S_AN_SVRNAME + " = '" + serverName + "' AND " + DBHelper.S_AN_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_AN_ARTICLENO + " = " + articleNo,
+                    null, null, null, null);
+            c.moveToFirst ();
+            int result = c.getCount ();
+            if (result > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 }
 
 

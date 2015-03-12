@@ -173,6 +173,11 @@ public class SubscribedGroupsDbOperator {
                     createRecord (grpName, serverName); // subscribe new groups in db
                 }
                 return 0;
+            } else if (cursor.getCount () == 0) {
+                for (String grpName : newAddedGrpList) {
+                    createRecord (grpName, serverName); // subscribe new groups in db
+                }
+                return 0;
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -12,11 +12,13 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.mail.Header;
 
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.sun.mail.dsn.MessageHeaders;
 
@@ -78,6 +80,27 @@ public class NNTPClientClass {
 	    	return Integer.parseInt(strRtnCode);
 	    }
 	}
+	
+    String sendCommandRawReturn (String cmd) throws IOException {
+        Log.i ("--->", "Sending command \"" + cmd + "\"...");
+        out.write (cmd + "\r\n");
+        out.flush ();
+
+        if ( (buffer = in.readLine ()) == null) {
+            throw new IOException ();
+        } else {
+            if (buffer.length () < 1)
+                throw new IOException ();
+            String strRtnCode = buffer.substring (0, 3);
+            if (buffer.charAt (0) != '2') {
+                Log.i ("--->", buffer);
+                Log.i ("--->", "error code " + strRtnCode);
+            } else {
+                Log.i ("--->", strRtnCode);
+            }
+            return buffer;
+        }
+    }
 	
 	String getTextResponse() throws IOException {
 		String text = "";
@@ -158,19 +181,21 @@ public class NNTPClientClass {
 			displayNewsgroup(newsgroups.elementAt(i).toString());
 	}
 	
-	void listNewsgroup (String group) throws IOException {
+	String listNewsgroup (String group) throws IOException {
 	    try {
             int rst = sendCommand("LISTGROUP " + group);
             if (rst>299) {
-                return;
+                return "";
             }
             Log.i("--->", group);
         } catch (Exception e) {
             Log.i("--->", e.getMessage());
-            return;
+            return "";
         }
 	    
-        String tmp = getTextResponse();
+        String allArticlesNumbers = getTextResponse();
+        
+        return allArticlesNumbers;
 
 	}
 
@@ -233,6 +258,7 @@ public class NNTPClientClass {
 	      }
 	    }
 	}  
+
 	
 	List<NNTPMessageHeader> displayNewsgroupHeads(String group) throws IOException {
 
@@ -272,11 +298,6 @@ public class NNTPClientClass {
 				
 				InputStream is = new ByteArrayInputStream(tmp.getBytes());
 				MessageHeaders headers = new MessageHeaders(is);
-				//headers_array.add (headers);
-				
-				//String[] subject = headers_array.get(sub_index).getHeader("Subject");
-				//String[] name_from = headers_array.get(sub_index).getHeader("from");
-				//String[] Injection = headers_array.get(sub_index).getHeader("Injection-Info");
 				
 				Enumeration <Header> en = headers.getAllHeaders();
 				while (en.hasMoreElements()) {
@@ -312,7 +333,95 @@ public class NNTPClientClass {
 		return article_list;
 	}
 	
-	
+	List <SparseArray<NNTPMessageHeader>> displayNewsgroupHeadsWithRawReturn (String group)
+            throws IOException {
+
+        List <SparseArray<NNTPMessageHeader>> headerList = new ArrayList <SparseArray<NNTPMessageHeader>> (); // all headers
+        String [] returnArray = {};
+        int articleId = 0;
+        
+        try {
+            int rst = sendCommand ("GROUP " + group);
+
+            if (rst > 299) {
+                throw new ZNewsCommandException ();
+            }
+            Log.i ("--->", group);
+        } catch (ZNewsCommandException e) {
+            Log.i ("--->", "Error: could not access newsgroup \"" + group
+                    + "\".");
+            return headerList;
+        } catch (IOException e) {
+            Log.i ("--->", e.getMessage ());
+            return headerList;
+        }
+
+        StringTokenizer st = new StringTokenizer (buffer, " ");
+        st.nextToken ();
+        st.nextToken ();
+        int firstArticleNumber = Integer.valueOf ( (st.nextToken ()));
+        int lastArticleNumber = Integer.valueOf ( (st.nextToken ()));
+        Log.i ("---> First article #", " " + firstArticleNumber);
+        Log.i ("---> Last article #", " " + lastArticleNumber);
+
+        while (true) {
+            SparseArray<NNTPMessageHeader> idHeaderMap = new SparseArray<NNTPMessageHeader> (); // single header
+            NNTPMessageHeader message_headers = new NNTPMessageHeader ();
+            try {
+                String firstLine = sendCommandRawReturn ("HEAD");
+                String strRtnCode = firstLine.substring(0, 3);
+                if (firstLine.charAt(0) != '2') {
+                  Log.i("--->", firstLine);
+                  Log.i("--->", "error code "+strRtnCode);
+                }
+                else {
+                    Log.i("--->", strRtnCode);
+                    returnArray = firstLine.split (" ");
+                    articleId = Integer.parseInt (returnArray [1]); // now ID
+                }
+                int rst = Integer.parseInt(strRtnCode); 
+                if (rst > 299) {
+                    break;
+                }
+                String tmp = getTextResponse ();
+
+                InputStream is = new ByteArrayInputStream (tmp.getBytes ());
+                MessageHeaders headers = new MessageHeaders (is);
+
+                Enumeration <Header> en = headers.getAllHeaders ();
+                while (en.hasMoreElements ()) {
+                    Header h = (Header) en.nextElement ();
+                    message_headers.setHeader (h.getName (), h.getValue ()); // set all headers of one single message
+                }
+
+                idHeaderMap.put (articleId, message_headers);
+                headerList.add (idHeaderMap);
+
+            } catch (Throwable e) {
+                Log.i ("--->", e.getMessage ());
+                // there's been a problem with the current article, let's try to
+                // get the next one
+            }
+
+            try {
+                int rst = sendCommand ("next"); // next post header
+                if (rst > 299) {
+                    break;
+                }
+            } catch (ZNewsCommandException e) {
+                // "next" command failed
+                // looks like there are no more articles in the current
+                // newsgroup
+                Log.i ("--->", e.getMessage ());
+                break;
+            } catch (IOException e) {
+                Log.i ("--->", e.getMessage ());
+                // an IO error, let's get out of here!
+                break;
+            }
+        }
+        return headerList;
+    }
 	  
 	void handleParameters(String args[]) throws IOException {
 		if (args[1].equalsIgnoreCase("-l")) {
@@ -330,6 +439,11 @@ public class NNTPClientClass {
 			Log.i("--->", "Error: invalid parameters.");
 		}
 	}
+
+    public void displayNewsgroupHeadsWithArticleNo (String groupname,
+            int articleNo) {
+        
+    }
 	  
 
 	  
