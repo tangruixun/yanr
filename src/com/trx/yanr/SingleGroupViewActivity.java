@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.os.Message;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 public class SingleGroupViewActivity extends Activity {
 
@@ -22,6 +24,8 @@ public class SingleGroupViewActivity extends Activity {
     private HandlerThread mGetArticles_thread;
     private GetArticlesRunnable myGetArticlesRunnable;
     private Context context;
+    
+    private ProgressDialog pDialog;
     
     private Bundle bundle;
     private String svrName;
@@ -41,19 +45,18 @@ public class SingleGroupViewActivity extends Activity {
         grpName = bundle.getString ("GroupName");
         
         // TODO: display article title in this Group;
-        mUI_handler = new Handler () {
+        mUI_handler = new Handler (new Handler.Callback() {
 
             @Override
-            public void handleMessage (Message msg) {
-                super.handleMessage (msg);
+            public boolean handleMessage (Message msg) {
                 if (msg.what == MSG_RETRIEVE_ARTICLES_COMPLETE) {
-                    
+                    dismissProDialog ();
                 }
+                return true;
             }
-        };
+        });
         
-
-
+        ListView lv = (ListView) findViewById (R.id.listview);
     }
 
     @Override
@@ -78,6 +81,8 @@ public class SingleGroupViewActivity extends Activity {
     }
     
     private void getGroupArticleNumbers () {
+        showProDialog(0, 100);
+        
         mGetArticles_thread = new HandlerThread ("GetGroupArticles");
         mGetArticles_thread.start ();
         mGetArticles_handler = new Handler (mGetArticles_thread.getLooper ());
@@ -100,13 +105,18 @@ public class SingleGroupViewActivity extends Activity {
             try {
                 // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
                 List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
-                ArticleNoDbOperator artlNoDbOptr = new ArticleNoDbOperator (context);
-                artlNoDbOptr.open ();
+                HeaderDbOperator headerDbOptr = new HeaderDbOperator (context);
+                //HeaderDbOperator headerDbOptr = new HeaderDbOperator (context);
+                headerDbOptr.open ();
                 for (SparseArray <NNTPMessageHeader> idHeaderMap : headerList) {
                     
-                    int articleNo = idHeaderMap.keyAt (0);
-                    if (!artlNoDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
-                        artlNoDbOptr.createRecord (grpName, svrName, articleNo);
+                    int articleNo;
+                    NNTPMessageHeader headers;
+                    articleNo = idHeaderMap.keyAt (0);
+                    headers = idHeaderMap.get (articleNo);
+
+                    if (!headerDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
+                        headerDbOptr.createRecord (grpName, svrName, articleNo, headers);
                     }
                 }
 
@@ -121,18 +131,43 @@ public class SingleGroupViewActivity extends Activity {
 //
 //                    }
 //                }
-                
-                
 
                 
-                
-                
-                
+                msg = this.handler.obtainMessage ();
+                msg.what = MSG_RETRIEVE_ARTICLES_COMPLETE;
+                this.handler.sendMessage (msg);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }        
+    }
+    
+    // style
+    // process
+    private void showProDialog (int style, int process) {
+        // Showing progress dialog
+        pDialog.setTitle(getString (R.string.pleasewait));
+        pDialog.setMessage (getString (R.string.pleasewaitlong));
+
+        if (style == 0) {
+            pDialog.setIndeterminate(true);
+        } else {
+            pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pDialog.setIndeterminate(false);
+            pDialog.setMax(100);
+        }
+        pDialog.setCancelable (true);
+        if (process == 0) {
+            process = 7;
+        }
+        pDialog.setProgress(process);
+        pDialog.show ();
+    }
+
+    private void dismissProDialog () {
+        if (pDialog.isShowing ())
+            pDialog.dismiss ();
     }
 }

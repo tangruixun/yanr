@@ -19,5 +19,7 @@
     <string name="db_path">/data/data/com.trx.yanr/databases/</string>
     <string name="title_activity_single_group_view">SingleGroupViewActivity</string>
     <string name="action_retrieve_articles">Retrieve Articles</string>
-
+    <string name="pleasewait">Please wait...</string>
+    <string name="pleasewaitlong">Waiting for retrieving complete...</string>
+        
 </resources>

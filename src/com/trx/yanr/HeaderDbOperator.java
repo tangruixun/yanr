@@ -7,14 +7,14 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-public class ArticleNoDbOperator {
+public class HeaderDbOperator {
 
     private SQLiteDatabase database;
     private DBHelper articleNoDbHelper;
-    public String [] allColumns = { DBHelper.S_AN_ID, DBHelper.S_AN_GRPNAME, 
-            DBHelper.S_AN_SVRNAME, DBHelper.S_AN_ARTICLENO };
+    public String [] allColumns = { DBHelper.S_H_ID, DBHelper.S_H_GRPNAME, 
+            DBHelper.S_H_SVRNAME, DBHelper.S_H_ARTICLENO, DBHelper.S_H_HEADERTEXT };
     
-    public ArticleNoDbOperator (Context context) {
+    public HeaderDbOperator (Context context) {
         super ();
         articleNoDbHelper = new DBHelper (context);
     }
@@ -27,24 +27,34 @@ public class ArticleNoDbOperator {
         articleNoDbHelper.close ();
     }
     
-    public Cursor createRecord (ArticleNoData articleNoData) {
-        String strGrpName = articleNoData.getGroupName ();
-        String strSrvName = articleNoData.getServerName ();
-        int nArticleNo = articleNoData.getArticleNumber ();
-        return createRecord (strGrpName, strSrvName, nArticleNo);
+    public Cursor createRecord (HeaderData headerData) {
+        String strGrpName = headerData.getGroupName ();
+        String strSrvName = headerData.getServerName ();
+        int nArticleNo = headerData.getArticleNumber ();
+        NNTPMessageHeader header = headerData.getHeader ();
+        String strHeaderText = header.getAllHeaderString ();
+        return createRecord (strGrpName, strSrvName, nArticleNo, strHeaderText);
+    }
+    
+    public Cursor createRecord (String strGrpName, String strSrvName, int nArticleNo,
+            NNTPMessageHeader headers) {
+        String tmp = headers.getHeader ("Injection-Info"); // test
+        String strHeaderText = headers.getAllHeaderString ();
+        return createRecord (strGrpName, strSrvName, nArticleNo, strHeaderText);
     }
 
     public Cursor createRecord (String strGrpName, String strSrvName,
-            int nArticleNo) {
+            int nArticleNo, String strHeaderText) {
         ContentValues contentValues = new ContentValues ();
-        contentValues.put (DBHelper.S_AN_GRPNAME, strGrpName);
-        contentValues.put (DBHelper.S_AN_SVRNAME, strSrvName);
-        contentValues.put (DBHelper.S_AN_ARTICLENO, nArticleNo);
+        contentValues.put (DBHelper.S_H_GRPNAME, strGrpName);
+        contentValues.put (DBHelper.S_H_SVRNAME, strSrvName);
+        contentValues.put (DBHelper.S_H_ARTICLENO, nArticleNo);
+        contentValues.put (DBHelper.S_H_HEADERTEXT, strHeaderText);
         
-        long insertId = database.insert (DBHelper.ARTICLE_NO_TABLE, null, contentValues);
+        long insertId = database.insert (DBHelper.HEADER_TABLE, null, contentValues);
         Cursor cursor = null;
         try {
-            cursor = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, DBHelper.S_AN_ID + " = " + insertId, 
+            cursor = database.query (DBHelper.HEADER_TABLE, allColumns, DBHelper.S_H_ID + " = " + insertId, 
                     null, null, null, null);
             cursor.moveToFirst ();
         } catch (Exception e) {
@@ -53,13 +63,13 @@ public class ArticleNoDbOperator {
         return cursor;
     }
     
-    public Cursor getArticleNoByGroup (String groupName, String serverName) {
+    public Cursor getRecordByGroup (String groupName, String serverName) {
         Cursor cursor = null;
         try {
             String [] selectArg = {groupName, serverName};
-            cursor = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, 
-                    DBHelper.S_AN_GRPNAME + " = ? AND " + DBHelper.S_AN_SVRNAME + " = ?", 
-                    selectArg, null, null, DBHelper.S_AN_ARTICLENO + " DESC");
+            cursor = database.query (DBHelper.HEADER_TABLE, allColumns, 
+                    DBHelper.S_H_GRPNAME + " = ? AND " + DBHelper.S_H_SVRNAME + " = ?", 
+                    selectArg, null, null, DBHelper.S_H_ARTICLENO + " DESC");
             cursor.moveToFirst ();
         } catch (Exception e) {
             e.printStackTrace ();
@@ -70,8 +80,8 @@ public class ArticleNoDbOperator {
     public void deleteRecord (String groupName, int articleNo) {
         Cursor c = null;
         try {
-            c = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, 
-                    DBHelper.S_AN_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_AN_ARTICLENO + " = " + articleNo,
+            c = database.query (DBHelper.HEADER_TABLE, allColumns, 
+                    DBHelper.S_H_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_H_ARTICLENO + " = " + articleNo,
                     null, null, null, null);
             c.moveToFirst ();
             deleteRecord (c);
@@ -84,7 +94,7 @@ public class ArticleNoDbOperator {
         try {
             if (c!=null) {
                 if (c.getCount () > 0) {
-                    Long _id = c.getLong (c.getColumnIndex (DBHelper.S_AN_ID));
+                    Long _id = c.getLong (c.getColumnIndex (DBHelper.S_H_ID));
                     deleteRecord (_id);
                 }
             }
@@ -97,7 +107,7 @@ public class ArticleNoDbOperator {
         try {
             // long id = record.getId();
             Log.i ("Record deleted with id: ---> ", String.valueOf (id));
-            int m = database.delete (DBHelper.ARTICLE_NO_TABLE, DBHelper.S_AN_ID
+            int m = database.delete (DBHelper.HEADER_TABLE, DBHelper.S_H_ID
                     + " = " + id, null);
             Log.i ("--->", m + " line(s) deleted");
         } catch (Exception e) {
@@ -108,7 +118,7 @@ public class ArticleNoDbOperator {
     public int clearAllRecords () {
         int deleteRow = 0;
         try {
-            deleteRow = database.delete (DBHelper.ARTICLE_NO_TABLE, "1", null);
+            deleteRow = database.delete (DBHelper.HEADER_TABLE, "1", null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,8 +131,8 @@ public class ArticleNoDbOperator {
             int articleNo) {
         Cursor c = null;
         try {
-            c = database.query (DBHelper.ARTICLE_NO_TABLE, allColumns, 
-                    DBHelper.S_AN_SVRNAME + " = '" + serverName + "' AND " + DBHelper.S_AN_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_AN_ARTICLENO + " = " + articleNo,
+            c = database.query (DBHelper.HEADER_TABLE, allColumns, 
+                    DBHelper.S_H_SVRNAME + " = '" + serverName + "' AND " + DBHelper.S_H_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_H_ARTICLENO + " = " + articleNo,
                     null, null, null, null);
             c.moveToFirst ();
             int result = c.getCount ();
@@ -136,8 +146,6 @@ public class ArticleNoDbOperator {
         }
         return false;
     }
-
-
 }
 
 

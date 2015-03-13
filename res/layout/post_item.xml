@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/PostItem"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@color/White"
+    android:padding="12dp"
+    android:stateListAnimator="@anim/raise" >
+
+    <TextView
+        android:id="@+id/PostSubject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:textSize="26sp" >
+    </TextView>
+    
+    <TextView
+        android:id="@+id/PostDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:textSize="12sp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true" >
+    </TextView>
+        
+    <TextView
+        android:id="@+id/PostFrom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:textSize="12sp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" >
+    </TextView>
+
+</RelativeLayout>

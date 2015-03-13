@@ -3,6 +3,7 @@ package com.trx.yanr;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,7 @@ public class AllGroupListActivity extends Activity {
     private NewsGroups allnewsgroups;
     private SparseBooleanArray selectionArray;
     private Context context; 
+    private ProgressDialog pDialog;
     
     private Bundle bundle;
     private String servername;
@@ -83,11 +85,12 @@ public class AllGroupListActivity extends Activity {
 //                                                                // Cursor
 //                    listItemAdapter.mCursor = newCursor;
 //                    listItemAdapter.notifyDataSetChanged ();
-//                    dismissProDialog ();
+                    dismissProDialog ();
                 }
             }            
         };
         
+        showProDialog (0, 100);
         mGetAllGroups_thread = new HandlerThread ("GetAllGoups");
         mGetAllGroups_thread.start ();
         mGetAllGroups_handler = new Handler (mGetAllGroups_thread.getLooper ());
@@ -164,8 +167,34 @@ public class AllGroupListActivity extends Activity {
             
             msg = this.handler.obtainMessage ();
             msg.what = MSG_ALL_GROUPS_RETRIEVED;
-            //msg.arg1 = 20;
             this.handler.sendMessage (msg);
         }
+    }
+    
+    // style
+    // process
+    private void showProDialog (int style, int process) {
+        // Showing progress dialog
+        pDialog.setTitle(getString (R.string.pleasewait));
+        pDialog.setMessage (getString (R.string.pleasewaitlong));
+
+        if (style == 0) {
+            pDialog.setIndeterminate(true);
+        } else {
+            pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pDialog.setIndeterminate(false);
+            pDialog.setMax(100);
+        }
+        pDialog.setCancelable (false);
+        if (process == 0) {
+            process = 7;
+        }
+        pDialog.setProgress(process);
+        pDialog.show ();
+    }
+
+    private void dismissProDialog () {
+        if (pDialog.isShowing ())
+            pDialog.dismiss ();
     }
 }
