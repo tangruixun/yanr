@@ -100,4 +100,25 @@ public class NewsOpHelper {
         }
         return headerList;
     }
+
+    public String retrieveBodyText (String servername, int port, String grpName,
+            int articleNo) throws IOException, Exception {
+        NNTPClientClass nntpclient = new NNTPClientClass();
+        String bodyText = "";
+        try {
+            Socket nntpSocket = nntpclient.connect (servername, port);
+            if (nntpSocket != null && nntpclient.in != null && nntpclient.out != null) {
+                Log.i("--->", "connect successful");
+                int i = nntpclient.open();
+                if (i != 0) {
+                    Log.i("open () error!!! Error: news server not found. --->", "" + i);
+                }
+                bodyText = nntpclient.displayNewsBody (grpName, articleNo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return bodyText;
+    }
 }

@@ -106,6 +106,9 @@ public class AllGroupListActivity extends Activity {
         if (mGetAllGroups_handler != null) {
             mGetAllGroups_handler.removeCallbacks (myGetAllGroupsRunnable);
         }
+        if (mGetAllGroups_thread != null) {
+            mGetAllGroups_thread.quit ();
+        }
         super.onDestroy ();
     }
 
@@ -199,4 +202,6 @@ public class AllGroupListActivity extends Activity {
         if (pDialog.isShowing ())
             pDialog.dismiss ();
     }
+    
+    
 }

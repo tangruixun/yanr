@@ -12,25 +12,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
 public class SingleGroupViewActivity extends Activity {
 
-    private final static int MSG_RETRIEVE_ARTICLES_COMPLETE = 1;
+    private final static int MSG_RETRIEVE_HEADERS_COMPLETE = 1;
+    private final static int MSG_RETRIEVE_BODYS_COMPLETE = 2;
     
     private Handler mUI_handler;
-    private Handler mGetArticles_handler;
-    private HandlerThread mGetArticles_thread;
-    private GetArticlesRunnable myGetArticlesRunnable;
+    private Handler mGetHeader_handler, mGetBody_handler;
+    private HandlerThread mGetHeader_thread, mGetBody_thread;
+    private GetHeaderRunnable myGetHeaderRunnable;
+    private GetBodyRunnable myGetBodyRunnable;
     private Context context;
     
     private ProgressDialog pDialog;
@@ -41,6 +43,7 @@ public class SingleGroupViewActivity extends Activity {
     private String grpName;
     private SingleGroupViewAdapter listItemAdapter;
     private HeaderDbOperator headDbOptr;
+    private BodyDbOperator bodyDbOptr;
     private Cursor cursor;
     
     @Override
@@ -61,7 +64,9 @@ public class SingleGroupViewActivity extends Activity {
 
             @Override
             public boolean handleMessage (Message msg) {
-                if (msg.what == MSG_RETRIEVE_ARTICLES_COMPLETE) {
+                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE) {
+                    dismissProDialog ();
+                } else if (msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
                     dismissProDialog ();
                 }
                 return true;
@@ -69,7 +74,9 @@ public class SingleGroupViewActivity extends Activity {
         });
         
         headDbOptr = new HeaderDbOperator (context);
+        bodyDbOptr = new BodyDbOperator (context);
         headDbOptr.open ();
+        bodyDbOptr.open ();
         cursor = headDbOptr.getRecordByGroup (grpName, svrName);
         if (cursor != null) {
             listItemAdapter = new SingleGroupViewAdapter (context, cursor,
@@ -88,9 +95,16 @@ public class SingleGroupViewActivity extends Activity {
                     if (cursor != null) {
                         cursor.moveToPosition (position);
                         int articleNo = cursor.getInt (cursor.getColumnIndex (DBHelper.S_H_ARTICLENO));
+                        if (!bodyDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
+                            // record not exist in Body Table
+                            
+                        }
                         Intent newsIntent = new Intent ();
                         newsIntent.setClass (context, NewsViewActivity.class);
                         newsIntent.putExtra ("ArticleNo", articleNo);
+                        newsIntent.putExtra ("ServerName", svrName);
+                        newsIntent.putExtra ("Port", port);
+                        newsIntent.putExtra ("GroupName", grpName);
                         startActivity (newsIntent);
                     }                    
                 }
@@ -122,17 +136,18 @@ public class SingleGroupViewActivity extends Activity {
     private void getGroupArticleNumbers () {
         showProDialog(0, 100);
         
-        mGetArticles_thread = new HandlerThread ("GetGroupArticles");
-        mGetArticles_thread.start ();
-        mGetArticles_handler = new Handler (mGetArticles_thread.getLooper ());
-        myGetArticlesRunnable = new GetArticlesRunnable (mUI_handler);
-        mGetArticles_handler.post (myGetArticlesRunnable);
+        mGetHeader_thread = new HandlerThread ("GetGroupArticles");
+        mGetHeader_thread.start ();
+        mGetHeader_handler = new Handler (mGetHeader_thread.getLooper ());
+        myGetHeaderRunnable = new GetHeaderRunnable ();
+        mGetHeader_handler.post (myGetHeaderRunnable);
     }
 
-    public class GetArticlesRunnable implements Runnable {
+    
+    public class GetHeaderRunnable implements Runnable {
         private Handler handler;
 
-        public GetArticlesRunnable (Handler mUI_handler) {
+        public GetHeaderRunnable () {
             super ();            
             this.handler = mUI_handler; // UI handler
         }        
@@ -169,10 +184,9 @@ public class SingleGroupViewActivity extends Activity {
 //
 //                    }
 //                }
-
                 
                 msg = this.handler.obtainMessage ();
-                msg.what = MSG_RETRIEVE_ARTICLES_COMPLETE;
+                msg.what = MSG_RETRIEVE_HEADERS_COMPLETE;
                 this.handler.sendMessage (msg);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -181,7 +195,57 @@ public class SingleGroupViewActivity extends Activity {
             }
         }        
     }
+
+    public class GetBodyRunnable implements Runnable {
+        private Handler handler;
+        private int articleNo;
+
+        public GetBodyRunnable (int articleNumber) {
+            super ();
+            this.handler = mUI_handler; // UI handler
+            articleNo = articleNumber;
+        }
+
+        @Override
+        public void run () {
+            Message msg;
+            NewsOpHelper newsOpHelper = new NewsOpHelper ();
+            try {
+                articleBody = newsOpHelper.retrieveBodyText (svrName, port, grpName, articleNo);
+                
+                
+                msg = this.handler.obtainMessage ();
+                msg.what = MSG_RETRIEVE_BODYS_COMPLETE;
+                this.handler.sendMessage (msg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }        
+    }
     
+    @Override
+    protected void onDestroy () {
+        Log.i ("onDestroy --->", "onDestroy()");
+        cursor.close ();
+        if (mGetHeader_handler != null) {
+            mGetHeader_handler.removeCallbacks (myGetHeaderRunnable);
+        }
+        
+        if (mGetBody_handler != null) {
+            mGetBody_handler.removeCallbacks (myGetBodyRunnable);
+        }
+        
+        if (mGetBody_thread != null) {
+            mGetBody_thread.quit ();
+        }
+        
+        if (mGetHeader_thread != null) {
+            mGetHeader_thread.quit ();
+        }
+        
+        super.onDestroy ();
+    }
+
     // style
     // process
     private void showProDialog (int style, int process) {

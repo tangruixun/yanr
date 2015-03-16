@@ -189,12 +189,12 @@ public class MainActivity extends FragmentActivity implements
         private ListView lv;
         private SubscribeGroupCursorListAdapter subdGrpAdptr;
         private SubscribedGroupsDbOperator sbscrbdGrpDbOper;
-        private String serverName;
+        private String svrName;
         private int port;
         Cursor cursor;
         
         public SubscribedGroupFragment (String serverName, int port) {
-            this.serverName = serverName;
+            this.svrName = serverName;
             this.port = port;
             cursor = null;
         }
@@ -226,7 +226,7 @@ public class MainActivity extends FragmentActivity implements
             
             try {
                 sbscrbdGrpDbOper.open ();
-                cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
+                cursor = sbscrbdGrpDbOper.getGroupsByServer (svrName);
                 
                 subdGrpAdptr = new SubscribeGroupCursorListAdapter (getActivity (),
                         cursor, SubscribeGroupCursorListAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -250,7 +250,7 @@ public class MainActivity extends FragmentActivity implements
         @Override
         public void onResume () {
             sbscrbdGrpDbOper.open ();
-            cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
+            cursor = sbscrbdGrpDbOper.getGroupsByServer (svrName);
             Cursor newCursor = cursor;
             subdGrpAdptr.changeCursor (newCursor); // automatically closes old Cursor
             subdGrpAdptr.mCursor = newCursor;
@@ -270,7 +270,7 @@ public class MainActivity extends FragmentActivity implements
                     
                     Intent selGrpIntent = new Intent ();
                     selGrpIntent.setClass (getActivity (), SingleGroupViewActivity.class);
-                    selGrpIntent.putExtra ("ServerName", serverName);
+                    selGrpIntent.putExtra ("ServerName", svrName);
                     selGrpIntent.putExtra ("Port", port);
                     selGrpIntent.putExtra ("GroupName", grpName);
                     getActivity ().startActivity (selGrpIntent);

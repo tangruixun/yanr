@@ -29,7 +29,25 @@ public class DBHelper extends SQLiteOpenHelper {
     public final static String S_H_ARTICLENO = "s_ArticleNumber";
     public final static String S_H_HEADERTEXT = "s_HeaderText";
     
-    private final static String createArticleNumberTableSQL = "CREATE TABLE "
+    public final static String BODY_TABLE = "Bodys";
+    public final static String S_B_ID = "_id";
+    public final static String S_B_GRPNAME = "s_GroupName";
+    public final static String S_B_SVRNAME = "s_ServerName";
+    public final static String S_B_ARTICLENO = "s_ArticleNumber";
+    public final static String S_B_BODYTEXT = "s_BodyText";
+    
+    private final static String createBodyTableSQL = "CREATE TABLE "
+            + BODY_TABLE
+            + " ("
+            + S_B_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + S_B_GRPNAME + " NVARCHAR(256), "
+            + S_B_SVRNAME + " NVARCHAR(256), "
+            + S_B_ARTICLENO + " INT, "
+            + S_B_BODYTEXT + " NVARCHAR(2147483647)"
+            + ")";
+            
+            
+    private final static String createHeaderTableSQL = "CREATE TABLE "
             + HEADER_TABLE
             + " ("
             + S_H_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -70,17 +88,19 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate (SQLiteDatabase db) {
         Log.i ("--->", "create database");
         db.execSQL (createSubscribedGroupTableSQL);
-        db.execSQL (createArticleNumberTableSQL);
+        db.execSQL (createHeaderTableSQL);
+        db.execSQL (createBodyTableSQL);
     }
 
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
-     // not required until second version :)
+        // not required until second version :)
         Log.i (DBHelper.class.getName (), "Upgrading database from version "
                 + oldVersion + " to " + newVersion
                 + ", which will destroy all old data");
-        db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
+        db.execSQL ("DROP TABLE IF EXISTS " + BODY_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + HEADER_TABLE);
+        db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
         onCreate (db);
     }
 

@@ -10,21 +10,21 @@ import android.util.Log;
 public class HeaderDbOperator {
 
     private SQLiteDatabase database;
-    private DBHelper articleNoDbHelper;
+    private DBHelper headerDbHelper;
     public String [] allColumns = { DBHelper.S_H_ID, DBHelper.S_H_GRPNAME, 
             DBHelper.S_H_SVRNAME, DBHelper.S_H_ARTICLENO, DBHelper.S_H_HEADERTEXT };
     
     public HeaderDbOperator (Context context) {
         super ();
-        articleNoDbHelper = new DBHelper (context);
+        headerDbHelper = new DBHelper (context);
     }
     
     public void open () throws SQLException {
-        database = articleNoDbHelper.getWritableDatabase ();
+        database = headerDbHelper.getWritableDatabase ();
     }
     
     public void close () throws SQLException {
-        articleNoDbHelper.close ();
+        headerDbHelper.close ();
     }
     
     public Cursor createRecord (HeaderData headerData) {
@@ -38,7 +38,7 @@ public class HeaderDbOperator {
     
     public Cursor createRecord (String strGrpName, String strSrvName, int nArticleNo,
             NNTPMessageHeader headers) {
-        String tmp = headers.getHeader ("Injection-Info"); // test
+        //String tmp = headers.getHeader ("Injection-Info"); // test
         String strHeaderText = headers.getAllHeaderString ();
         return createRecord (strGrpName, strSrvName, nArticleNo, strHeaderText);
     }
@@ -51,9 +51,9 @@ public class HeaderDbOperator {
         contentValues.put (DBHelper.S_H_ARTICLENO, nArticleNo);
         contentValues.put (DBHelper.S_H_HEADERTEXT, strHeaderText);
         
-        long insertId = database.insert (DBHelper.HEADER_TABLE, null, contentValues);
         Cursor cursor = null;
         try {
+            long insertId = database.insert (DBHelper.HEADER_TABLE, null, contentValues);
             cursor = database.query (DBHelper.HEADER_TABLE, allColumns, DBHelper.S_H_ID + " = " + insertId, 
                     null, null, null, null);
             cursor.moveToFirst ();
@@ -124,8 +124,6 @@ public class HeaderDbOperator {
         }
         return deleteRow;
     }
-
-
 
     public boolean isNumberExisted (String groupName, String serverName, 
             int articleNo) {
