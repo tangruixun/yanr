@@ -41,6 +41,8 @@ public class AllGroupListActivity extends Activity {
         super.onCreate (savedInstanceState);
         
         context = this;
+        pDialog = new ProgressDialog (context);
+        
         bundle = getIntent ().getExtras ();
         servername = bundle.getString ("ServerName");
         port = bundle.getInt ("Port");
@@ -91,7 +93,7 @@ public class AllGroupListActivity extends Activity {
         };
         
         showProDialog (0, 100);
-        mGetAllGroups_thread = new HandlerThread ("GetAllGoups");
+        mGetAllGroups_thread = new HandlerThread ("GetAllGroups");
         mGetAllGroups_thread.start ();
         mGetAllGroups_handler = new Handler (mGetAllGroups_thread.getLooper ());
         myGetAllGroupsRunnable = new GetAllGroupsRunnable (mUI_handler);

@@ -53,6 +53,10 @@
             android:name=".SingleGroupViewActivity"
             android:label="@string/title_activity_single_group_view" >
         </activity>
+        <activity
+            android:name=".NewsViewActivity"
+            android:label="@string/title_activity_news_view" >
+        </activity>
     </application>
 
 </manifest>

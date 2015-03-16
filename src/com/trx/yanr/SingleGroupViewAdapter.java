@@ -29,7 +29,7 @@ public class SingleGroupViewAdapter extends CursorAdapter {
     @Override
     public View newView (Context context, Cursor cursor, ViewGroup parent) {
         tag = new TagView ();
-        View view = adapterInflater.inflate (R.layout.post_item, parent, false);
+        View view = adapterInflater.inflate (R.layout.postsubject_item, parent, false);
         
         tag.subjectView = (TextView) view.findViewById (R.id.PostSubject);
         tag.authorView = (TextView) view.findViewById (R.id.PostFrom);
@@ -42,17 +42,23 @@ public class SingleGroupViewAdapter extends CursorAdapter {
     @Override
     public void bindView (View view, Context context, Cursor cursor) {
         tag = (TagView) view.getTag ();
+        String subject = "";
+        String author = "";
+        String dateTime = "";
         try {
             String headerText = mCursor.getString (mCursor.getColumnIndex (DBHelper.S_H_HEADERTEXT));
             NNTPMessageHeader nntpHeader = NNTPMessageHeader.cvrtTxt (headerText);
-            String subject = nntpHeader.getSubject ();
-            String author = nntpHeader.getFrom ();
-            String dateTime = nntpHeader.getDate ();
+            subject = nntpHeader.getSubject ();
+            author = nntpHeader.getFrom ();
+            dateTime = nntpHeader.getDate ();
         } catch (MessagingException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        tag.subjectView.setText (subject);
+        tag.authorView.setText (author);
+        tag.dateView.setText (dateTime);
 
     }
     

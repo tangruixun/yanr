@@ -6,6 +6,8 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -13,7 +15,13 @@ import android.os.Message;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
+
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
 public class SingleGroupViewActivity extends Activity {
 
@@ -31,6 +39,9 @@ public class SingleGroupViewActivity extends Activity {
     private String svrName;
     private int port;
     private String grpName;
+    private SingleGroupViewAdapter listItemAdapter;
+    private HeaderDbOperator headDbOptr;
+    private Cursor cursor;
     
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -38,6 +49,7 @@ public class SingleGroupViewActivity extends Activity {
         setContentView (R.layout.layout_single_group_view);
         
         context = this;
+        pDialog = new ProgressDialog (context);
         
         bundle = getIntent ().getExtras ();
         svrName = bundle.getString ("ServerName");
@@ -56,7 +68,34 @@ public class SingleGroupViewActivity extends Activity {
             }
         });
         
-        ListView lv = (ListView) findViewById (R.id.listview);
+        headDbOptr = new HeaderDbOperator (context);
+        headDbOptr.open ();
+        cursor = headDbOptr.getRecordByGroup (grpName, svrName);
+        if (cursor != null) {
+            listItemAdapter = new SingleGroupViewAdapter (context, cursor,
+                    SingleGroupViewAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+            SwingBottomInAnimationAdapter swingadapter = new SwingBottomInAnimationAdapter (
+                    listItemAdapter);
+            ListView lv = (ListView) findViewById (R.id.listview);
+            swingadapter.setInitialDelayMillis (300); /* 刚开始进入的延长时间 */
+            swingadapter.setAbsListView (lv);
+            lv.setAdapter (swingadapter);
+            lv.setOnItemClickListener (new OnItemClickListener() {
+
+                @Override
+                public void onItemClick (AdapterView <?> parent, View view,
+                        int position, long id) {
+                    if (cursor != null) {
+                        cursor.moveToPosition (position);
+                        int articleNo = cursor.getInt (cursor.getColumnIndex (DBHelper.S_H_ARTICLENO));
+                        Intent newsIntent = new Intent ();
+                        newsIntent.setClass (context, NewsViewActivity.class);
+                        newsIntent.putExtra ("ArticleNo", articleNo);
+                        startActivity (newsIntent);
+                    }                    
+                }
+            }); 
+        }
     }
 
     @Override
@@ -127,7 +166,6 @@ public class SingleGroupViewActivity extends Activity {
 //                    int articleNo = Integer.valueOf (strArticleNo);
 //                    if (!artlNoDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
 //                        artlNoDbOptr.createRecord (grpName, svrName, articleNo);
-//                        
 //
 //                    }
 //                }
