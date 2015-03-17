@@ -345,6 +345,8 @@ public class NNTPClientClass {
                     Log.i("--->", strRtnCode);
                     returnArray = firstLine.split (" ");
                     articleId = Integer.parseInt (returnArray [1]); // now ID
+                    Log.i ("--->", group);
+                    Log.i ("--->", articleId + "");
                 }
                 int rst = Integer.parseInt(strRtnCode); 
                 if (rst > 299) {

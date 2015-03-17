@@ -35,7 +35,7 @@ public class BodyDbOperator {
         return createRecord (strGrpName, strSrvName, nArticleNo, strBody);
     }
 
-    private Cursor createRecord (String strGrpName, String strSrvName,
+    public Cursor createRecord (String strGrpName, String strSrvName,
             int nArticleNo, String strBody) {
         
         ContentValues contentValues = new ContentValues ();
@@ -108,5 +108,20 @@ public class BodyDbOperator {
             e.printStackTrace();
         }
         return false;
+    }
+    
+    public Cursor getRecordByArticleId (String groupName, String serverName, int articleNo) {
+        Cursor cursor = null;
+        try {
+            cursor = database.query (DBHelper.BODY_TABLE, allColumns, 
+                    DBHelper.S_B_GRPNAME + " = '" + groupName 
+                    + "' AND " + DBHelper.S_B_SVRNAME + " = '" + serverName 
+                    + "' AND " + DBHelper.S_B_ARTICLENO + " = " + articleNo,
+                    null, null, null, null);
+            cursor.moveToFirst ();
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+        return cursor;
     }
 }

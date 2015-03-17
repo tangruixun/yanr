@@ -63,7 +63,7 @@ public class HeaderDbOperator {
         return cursor;
     }
     
-    public Cursor getRecordByGroup (String groupName, String serverName) {
+    public Cursor getAllRecordByGroup (String groupName, String serverName) {
         Cursor cursor = null;
         try {
             String [] selectArg = {groupName, serverName};
@@ -77,11 +77,28 @@ public class HeaderDbOperator {
         return cursor;
     }
     
-    public void deleteRecord (String groupName, int articleNo) {
+    public Cursor getRecordByArticleId (String groupName, String serverName, int articleNo) {
+        Cursor cursor = null;
+        try {
+            cursor = database.query (DBHelper.HEADER_TABLE, allColumns, 
+                    DBHelper.S_H_GRPNAME + " = '" + groupName 
+                    + "' AND " + DBHelper.S_H_SVRNAME + " = '" + serverName 
+                    + "' AND " + DBHelper.S_H_ARTICLENO + " = " + articleNo,
+                    null, null, null, null);
+            cursor.moveToFirst ();
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+        return cursor;
+    }
+    
+    public void deleteRecord (String groupName, String serverName, int articleNo) {
         Cursor c = null;
         try {
             c = database.query (DBHelper.HEADER_TABLE, allColumns, 
-                    DBHelper.S_H_GRPNAME + " = '" + groupName + "' AND " + DBHelper.S_H_ARTICLENO + " = " + articleNo,
+                    DBHelper.S_H_GRPNAME + " = '" + groupName 
+                    + "' AND " + DBHelper.S_H_SVRNAME + " = '" + serverName 
+                    + "' AND " + DBHelper.S_H_ARTICLENO + " = " + articleNo,
                     null, null, null, null);
             c.moveToFirst ();
             deleteRecord (c);

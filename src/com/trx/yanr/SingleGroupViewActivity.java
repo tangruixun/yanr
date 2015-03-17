@@ -73,11 +73,19 @@ public class SingleGroupViewActivity extends Activity {
             }
         });
         
+        mGetHeader_thread = new HandlerThread ("GetGroupHeaders");
+        mGetHeader_thread.start ();
+        mGetHeader_handler = new Handler (mGetHeader_thread.getLooper ());
+        
+        mGetBody_thread = new HandlerThread ("GetGroupBodys");
+        mGetBody_thread.start ();
+        mGetBody_handler = new Handler (mGetBody_thread.getLooper ());
+        
         headDbOptr = new HeaderDbOperator (context);
         bodyDbOptr = new BodyDbOperator (context);
         headDbOptr.open ();
         bodyDbOptr.open ();
-        cursor = headDbOptr.getRecordByGroup (grpName, svrName);
+        cursor = headDbOptr.getAllRecordByGroup (grpName, svrName);
         if (cursor != null) {
             listItemAdapter = new SingleGroupViewAdapter (context, cursor,
                     SingleGroupViewAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -97,6 +105,9 @@ public class SingleGroupViewActivity extends Activity {
                         int articleNo = cursor.getInt (cursor.getColumnIndex (DBHelper.S_H_ARTICLENO));
                         if (!bodyDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
                             // record not exist in Body Table
+                            showProDialog (0, 100);
+                            myGetBodyRunnable = new GetBodyRunnable (articleNo);
+                            mGetBody_handler.post (myGetBodyRunnable);
                             
                         }
                         Intent newsIntent = new Intent ();
@@ -106,9 +117,9 @@ public class SingleGroupViewActivity extends Activity {
                         newsIntent.putExtra ("Port", port);
                         newsIntent.putExtra ("GroupName", grpName);
                         startActivity (newsIntent);
-                    }                    
+                    }
                 }
-            }); 
+            });
         }
     }
 
@@ -136,9 +147,7 @@ public class SingleGroupViewActivity extends Activity {
     private void getGroupArticleNumbers () {
         showProDialog(0, 100);
         
-        mGetHeader_thread = new HandlerThread ("GetGroupArticles");
-        mGetHeader_thread.start ();
-        mGetHeader_handler = new Handler (mGetHeader_thread.getLooper ());
+
         myGetHeaderRunnable = new GetHeaderRunnable ();
         mGetHeader_handler.post (myGetHeaderRunnable);
     }
@@ -167,6 +176,7 @@ public class SingleGroupViewActivity extends Activity {
                     int articleNo;
                     NNTPMessageHeader headers;
                     articleNo = idHeaderMap.keyAt (0);
+                    Log.i ("--->", articleNo + "");
                     headers = idHeaderMap.get (articleNo);
 
                     if (!headerDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
@@ -211,12 +221,17 @@ public class SingleGroupViewActivity extends Activity {
             Message msg;
             NewsOpHelper newsOpHelper = new NewsOpHelper ();
             try {
-                articleBody = newsOpHelper.retrieveBodyText (svrName, port, grpName, articleNo);
+                String articleBody = newsOpHelper.retrieveBodyText (svrName, port, grpName, articleNo);
+                
+                BodyDbOperator bodyDbOptr = new BodyDbOperator (context);
+                bodyDbOptr.open ();
+                bodyDbOptr.createRecord (grpName, svrName, articleNo, articleBody);
                 
                 
-                msg = this.handler.obtainMessage ();
-                msg.what = MSG_RETRIEVE_BODYS_COMPLETE;
-                this.handler.sendMessage (msg);
+                
+//                msg = this.handler.obtainMessage ();
+//                msg.what = MSG_RETRIEVE_BODYS_COMPLETE;
+//                this.handler.sendMessage (msg);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -260,7 +275,7 @@ public class SingleGroupViewActivity extends Activity {
             pDialog.setIndeterminate(false);
             pDialog.setMax(100);
         }
-        pDialog.setCancelable (true);
+        pDialog.setCancelable (false);
         if (process == 0) {
             process = 7;
         }
