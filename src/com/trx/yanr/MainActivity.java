@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,11 +41,7 @@ public class MainActivity extends FragmentActivity implements
      */
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
-    /**
-     * Used to store the last screen title. For use in
-     * {@link #restoreActionBar()}.
-     */
-    private CharSequence mTitle;
+
 
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
@@ -61,10 +59,10 @@ public class MainActivity extends FragmentActivity implements
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager ()
                 .findFragmentById (R.id.navigation_drawer);
         
-        mTitle = getString (R.string.grouplist);
         // Set up the drawer.
         mNavigationDrawerFragment.setUp (R.id.navigation_drawer,
                 (DrawerLayout) findViewById (R.id.drawer_layout));
+        
         
         if (savedInstanceState == null) {
             getFragmentManager ().beginTransaction ()
@@ -153,6 +151,29 @@ public class MainActivity extends FragmentActivity implements
         
     }
     
+    @Override
+    public boolean onKeyDown (int keyCode, KeyEvent event) {
+     // return super.onKeyDown (keyCode, event);
+        if (keyCode == KeyEvent.KEYCODE_BACK) {  
+            if (isQuit == false) {  
+                isQuit = true;  
+                Toast.makeText(getBaseContext(), getResources ().getString (R.string.pressagain), Toast.LENGTH_SHORT).show();  
+                TimerTask task = null;  
+                task = new TimerTask() {  
+                    @Override  
+                    public void run() {  
+                        isQuit = false;  
+                    }  
+                };  
+                timer.schedule(task, 2000);  
+            } else {  
+                finish();  
+                System.exit(0);  
+            }  
+        }  
+        return true;  
+    }
+
     /**
      * Copies your database from your local assets-folder to the just created
      * empty database in the system folder, from where it can be accessed and

@@ -2,6 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.trx.yanr.MainActivity" >
 
+
+    
     <item
         android:id="@+id/action_groupsubscribe"
         android:showAsAction="ifRoom"
@@ -10,10 +12,11 @@
         android:title="@string/action_groupsubscribe"/>
     <item
         android:id="@+id/action_example"
-        android:showAsAction="withText|ifRoom"
+        android:showAsAction="ifRoom"
         android:title="@string/action_example"/>
     <item
         android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
         android:orderInCategory="109"
         android:showAsAction="never"
         android:title="@string/action_settings"/>

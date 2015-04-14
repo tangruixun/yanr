@@ -28,8 +28,17 @@ import android.widget.Toast;
  * > design guidelines</a> for a complete explanation of the behaviors
  * implemented here.
  */
+
+
+
 public class NavigationDrawerFragment extends Fragment {
 
+    /**
+     * Used to store the last screen title. For use in
+     * {@link #restoreActionBar()}.
+     */
+    private CharSequence mTitle;
+    private CharSequence mDrawerTitle;
     /**
      * Remember the position of the selected item.
      */
@@ -72,6 +81,9 @@ public class NavigationDrawerFragment extends Fragment {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences (getActivity ());
         mUserLearnedDrawer = sp.getBoolean (PREF_USER_LEARNED_DRAWER, false);
+        
+        mTitle = getActivity().getString (R.string.grouplist);
+        mDrawerTitle = getActivity().getString (R.string.app_name);
 
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState
@@ -166,7 +178,7 @@ public class NavigationDrawerFragment extends Fragment {
                 if (!isAdded ()) {
                     return;
                 }
-
+                getActionBar ().setTitle (mTitle);
                 getActivity ().invalidateOptionsMenu (); // calls
                                                          // onPrepareOptionsMenu()
             }
@@ -177,7 +189,7 @@ public class NavigationDrawerFragment extends Fragment {
                 if (!isAdded ()) {
                     return;
                 }
-
+                getActionBar ().setTitle (mDrawerTitle);
                 if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to
                     // prevent auto-showing

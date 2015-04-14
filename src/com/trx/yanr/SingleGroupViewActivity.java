@@ -3,6 +3,7 @@ package com.trx.yanr;
 import java.io.IOException;
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -58,6 +59,12 @@ public class SingleGroupViewActivity extends Activity {
         svrName = bundle.getString ("ServerName");
         port = bundle.getInt ("Port");
         grpName = bundle.getString ("GroupName");
+        
+        
+        ActionBar actionBar = getActionBar ();
+        actionBar.setTitle (grpName);
+        actionBar.setDisplayShowTitleEnabled (true);
+        actionBar.setDisplayHomeAsUpEnabled (true);
         
         // TODO: display article title in this Group;
         mUI_handler = new Handler (new Handler.Callback() {
@@ -155,16 +162,18 @@ public class SingleGroupViewActivity extends Activity {
     
     public class GetHeaderRunnable implements Runnable {
         private Handler handler;
-
+        private NewsOpHelper newsOpHelper;
+        
         public GetHeaderRunnable () {
             super ();            
             this.handler = mUI_handler; // UI handler
+            newsOpHelper = new NewsOpHelper ();
         }        
 
         @Override
         public void run () {
             Message msg;
-            NewsOpHelper newsOpHelper = new NewsOpHelper ();
+
             try {
                 // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
                 List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
@@ -209,17 +218,18 @@ public class SingleGroupViewActivity extends Activity {
     public class GetBodyRunnable implements Runnable {
         private Handler handler;
         private int articleNo;
+        private NewsOpHelper newsOpHelper;
 
         public GetBodyRunnable (int articleNumber) {
             super ();
             this.handler = mUI_handler; // UI handler
             articleNo = articleNumber;
+            newsOpHelper = new NewsOpHelper ();
         }
 
         @Override
         public void run () {
             Message msg;
-            NewsOpHelper newsOpHelper = new NewsOpHelper ();
             try {
                 String articleBody = newsOpHelper.retrieveBodyText (svrName, port, grpName, articleNo);
                 
@@ -235,7 +245,7 @@ public class SingleGroupViewActivity extends Activity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }        
+        }
     }
     
     @Override

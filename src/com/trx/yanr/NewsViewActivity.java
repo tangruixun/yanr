@@ -2,6 +2,7 @@ package com.trx.yanr;
 
 import javax.mail.MessagingException;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -50,6 +51,7 @@ public class NewsViewActivity extends Activity {
         bodyView = (TextView) findViewById (R.id.bodytext);
         bodyView.setMovementMethod (new ScrollingMovementMethod ());
 
+
         try {
             // header
             Cursor cHeader = headerDbOptr.getRecordByArticleId (grpName, svrName,
@@ -70,6 +72,11 @@ public class NewsViewActivity extends Activity {
             newsgroupView.setText (strNewsgroup); 
             dateView.setText (strDate);
             bodyView.setText (strBody);
+            
+            ActionBar actionBar = getActionBar ();
+            actionBar.setTitle (strSubject);
+            actionBar.setDisplayShowTitleEnabled (true);
+            actionBar.setDisplayHomeAsUpEnabled (true);
         } catch (MessagingException e) {
             e.printStackTrace ();
         }

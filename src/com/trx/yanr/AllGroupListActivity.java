@@ -150,16 +150,18 @@ public class AllGroupListActivity extends Activity {
     public class GetAllGroupsRunnable implements Runnable {
         
         private Handler handler;
+        private NewsOpHelper newsOpHelper;
 
         public GetAllGroupsRunnable (Handler mUI_handler) {
             super ();
             this.handler = mUI_handler; // UI handler
+            newsOpHelper = new NewsOpHelper ();
+
         }
 
         @Override
         public void run () {
             Message msg;
-            NewsOpHelper newsOpHelper = new NewsOpHelper ();
             try {
                 allnewsgroups = newsOpHelper.retrieveAllGroups (servername, port);
                 

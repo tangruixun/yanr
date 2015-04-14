@@ -6,6 +6,7 @@
         android:id="@+id/action_retrieve_articles"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_get"
         android:title="@string/action_retrieve_articles"/>
 
 </menu>
