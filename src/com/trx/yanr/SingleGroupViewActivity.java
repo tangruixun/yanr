@@ -71,10 +71,11 @@ public class SingleGroupViewActivity extends Activity {
 
             @Override
             public boolean handleMessage (Message msg) {
-                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE) {
+                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE 
+                        || msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
                     dismissProDialog ();
-                } else if (msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
-                    dismissProDialog ();
+                } else {
+                    
                 }
                 return true;
             }
@@ -163,7 +164,8 @@ public class SingleGroupViewActivity extends Activity {
     public class GetHeaderRunnable implements Runnable {
         private Handler handler;
         private NewsOpHelper newsOpHelper;
-        
+        Message msg;
+
         public GetHeaderRunnable () {
             super ();            
             this.handler = mUI_handler; // UI handler
@@ -172,7 +174,6 @@ public class SingleGroupViewActivity extends Activity {
 
         @Override
         public void run () {
-            Message msg;
 
             try {
                 // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
@@ -239,9 +240,9 @@ public class SingleGroupViewActivity extends Activity {
                 
                 
                 
-//                msg = this.handler.obtainMessage ();
-//                msg.what = MSG_RETRIEVE_BODYS_COMPLETE;
-//                this.handler.sendMessage (msg);
+                msg = this.handler.obtainMessage ();
+                msg.what = MSG_RETRIEVE_BODYS_COMPLETE;
+                this.handler.sendMessage (msg);
             } catch (Exception e) {
                 e.printStackTrace();
             }

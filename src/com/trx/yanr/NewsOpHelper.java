@@ -81,6 +81,23 @@ public class NewsOpHelper {
 //        return headerText;
 //    }
     
+    public List <SparseArray<NNTPMessageHeader>> retrieveNewHeaders (String servername, int port, String groupname) throws IOException, Exception {
+        NNTPClientClass nntpclient = new NNTPClientClass();
+        List <SparseArray<NNTPMessageHeader>> headerList= new ArrayList <SparseArray<NNTPMessageHeader>> ();
+        try {
+            
+            
+            
+            
+            
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return headerList;       
+    }
+    
     public List <SparseArray<NNTPMessageHeader>> retrieveAllHeaders (String servername, int port, String groupname) throws IOException, Exception {
         NNTPClientClass nntpclient = new NNTPClientClass();
         List <SparseArray<NNTPMessageHeader>> headerList= new ArrayList <SparseArray<NNTPMessageHeader>> ();
