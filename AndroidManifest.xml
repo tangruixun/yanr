@@ -38,8 +38,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,20 +48,17 @@
         <activity
             android:name=".AllGroupListActivity"
             android:label="@string/title_activity_subscribe"
-            android:parentActivityName="com.trx.yanr.MainActivity"
-            android:theme="@style/AppTheme" >
+            android:parentActivityName="com.trx.yanr.MainActivity" >
         </activity>
         <activity
             android:name=".SingleGroupViewActivity"
             android:label="@string/title_activity_single_group_view"
-            android:parentActivityName="com.trx.yanr.MainActivity"
-            android:theme="@style/AppTheme"  >
+            android:parentActivityName="com.trx.yanr.MainActivity" >
         </activity>
         <activity
             android:name=".NewsViewActivity"
             android:label="@string/title_activity_news_view"
-            android:parentActivityName="com.trx.yanr.SingleGroupViewActivity"
-            android:theme="@style/AppTheme"  >
+            android:parentActivityName="com.trx.yanr.SingleGroupViewActivity" >
         </activity>
     </application>
 
