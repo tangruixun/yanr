@@ -158,15 +158,16 @@ public class SingleGroupViewActivity extends Activity {
 
             @Override
             public boolean handleMessage (Message msg) {
+                dismissProDialog ();
+
                 if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE) {
-                    dismissProDialog ();
+
                     cursor = headDbOptr.getAllRecordByGroup (grpName, svrName);
                     Cursor newCursor = cursor;
                     listItemAdapter.changeCursor (newCursor); // automatically closes old Cursor
                     listItemAdapter.mCursor = newCursor;
                     listItemAdapter.notifyDataSetChanged ();
                 } else if (msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
-                    dismissProDialog ();
                     int articleNo = msg.arg1;
                     Intent newsIntent = new Intent ();
                     newsIntent.setClass (context, NewsViewActivity.class);
@@ -176,7 +177,8 @@ public class SingleGroupViewActivity extends Activity {
                     newsIntent.putExtra ("GroupName", grpName);
                     startActivity (newsIntent);
                 } else {
-                    
+
+
                 }
                 return true;
             }
