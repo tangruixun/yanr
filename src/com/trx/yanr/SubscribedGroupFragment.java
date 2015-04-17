@@ -34,38 +34,44 @@ public class SubscribedGroupFragment extends Fragment {
     private int port;
     private Context context;
     Cursor cursor = null;
-    
-    public static final SubscribedGroupFragment newInstance(String serverName, int port)
-    {
-        SubscribedGroupFragment f = new SubscribedGroupFragment();
-        Bundle bdl = new Bundle(2);
-        bdl.putString("ServerName", serverName);
-        bdl.putInt("Port", port);
-        f.setArguments(bdl);
+    Bundle bundle;
+
+    public static final SubscribedGroupFragment newInstance (String serverName,
+            int port) {
+        SubscribedGroupFragment f = new SubscribedGroupFragment ();
+        Bundle bdl = new Bundle (2);
+        bdl.putString ("ServerName", serverName);
+        bdl.putInt ("Port", port);
+        f.setArguments (bdl);
         return f;
     }
-    
+
     @Override
     public void onAttach (Activity activity) {
         super.onAttach (activity);
         context = activity;
     }
 
-
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
-        serverName = getArguments().getString("ServerName");
-        port = getArguments().getInt("Port");
+        if (bundle == null && savedInstanceState != null) {
+            bundle = savedInstanceState;
+            serverName = bundle.getString ("ServerName");
+            port = bundle.getInt ("Port");
+        } else {
+            serverName = getArguments ().getString ("ServerName");
+            port = getArguments ().getInt ("Port");
+        }
         sbscrbdGrpDbOper = new SubscribedGroupsDbOperator (getActivity ());
     }
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View rootView = inflater.inflate (R.layout.frag_grouplist,
-                container, false);
-        setHasOptionsMenu(true);
+        View rootView = inflater.inflate (R.layout.frag_grouplist, container,
+                false);
+        setHasOptionsMenu (true);
         return rootView;
     }
 
@@ -75,29 +81,37 @@ public class SubscribedGroupFragment extends Fragment {
         Log.i ("--->", "onActivityCreated");
 
         lv = (ListView) getActivity ().findViewById (R.id.listview);
-        
+
         try {
             sbscrbdGrpDbOper.open ();
             cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
-            
-            subdGrpAdptr = new SubscribeGroupCursorListAdapter (getActivity (),
-                    cursor, SubscribeGroupCursorListAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-            
-            SwingBottomInAnimationAdapter swingadapter = new SwingBottomInAnimationAdapter (subdGrpAdptr);
+
+            subdGrpAdptr = new SubscribeGroupCursorListAdapter (
+                    getActivity (),
+                    cursor,
+                    SubscribeGroupCursorListAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+            SwingBottomInAnimationAdapter swingadapter = new SwingBottomInAnimationAdapter (
+                    subdGrpAdptr);
             swingadapter.setInitialDelayMillis (300); /* 刚开始进入的延长时间 */
             swingadapter.setAbsListView (lv);
             lv.setAdapter (swingadapter);
 
         } catch (Exception e) {
-            
+            e.printStackTrace ();
         }
-        
+
         GroupItemClickListener grpSelectListener = new GroupItemClickListener ();
         lv.setOnItemClickListener (grpSelectListener);
-        
+
     }
-    
-    
+
+    @Override
+    public void onSaveInstanceState (Bundle outState) {
+        super.onSaveInstanceState (outState);
+        outState.putString ("ServerName", serverName);
+        outState.putInt ("Port", port);
+    }
 
     @Override
     public void onCreateOptionsMenu (Menu menu, MenuInflater inflater) {
@@ -105,8 +119,6 @@ public class SubscribedGroupFragment extends Fragment {
         inflater.inflate (R.menu.main, menu);
 
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
@@ -120,25 +132,26 @@ public class SubscribedGroupFragment extends Fragment {
             subscribeIntent.putExtra ("Port", port);
             this.startActivity (subscribeIntent);
             break;
-            
+
         case R.id.action_refresh:
             cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
             Cursor newCursor = cursor;
-            subdGrpAdptr.changeCursor (newCursor); // automatically closes old Cursor
+            subdGrpAdptr.changeCursor (newCursor); // automatically closes old
+                                                   // Cursor
             subdGrpAdptr.mCursor = newCursor;
             subdGrpAdptr.notifyDataSetChanged ();
             break;
-            
+
         case R.id.action_settings:
-            //return true;
+            // return true;
             break;
-            
+
         case R.id.action_rebuilddb:
             AlertDialog.Builder builder = new AlertDialog.Builder (context);
             builder.setTitle (getString (R.string.warning));
             builder.setMessage (getString (R.string.rebuild_alert));
             builder.setCancelable (true);
-            builder.setIcon(android.R.drawable.ic_dialog_alert);
+            builder.setIcon (android.R.drawable.ic_dialog_alert);
             builder.setPositiveButton (android.R.string.yes,
                     new DialogInterface.OnClickListener () {
                         public void onClick (DialogInterface dialog, int id) {
@@ -159,7 +172,7 @@ public class SubscribedGroupFragment extends Fragment {
             AlertDialog alertbox = builder.create ();
             alertbox.show ();
             break;
-            
+
         default:
 
             break;
@@ -167,19 +180,18 @@ public class SubscribedGroupFragment extends Fragment {
         return super.onOptionsItemSelected (item);
     }
 
-
-
     @Override
     public void onResume () {
         sbscrbdGrpDbOper.open ();
         cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
         Cursor newCursor = cursor;
-        subdGrpAdptr.changeCursor (newCursor); // automatically closes old Cursor
+        subdGrpAdptr.changeCursor (newCursor); // automatically closes old
+                                               // Cursor
         subdGrpAdptr.mCursor = newCursor;
         subdGrpAdptr.notifyDataSetChanged ();
         super.onResume ();
     }
-    
+
     class GroupItemClickListener implements OnItemClickListener {
 
         @Override
@@ -187,21 +199,21 @@ public class SubscribedGroupFragment extends Fragment {
                 int position, long id) {
             if (cursor != null) {
                 cursor.moveToPosition (position);
-                String grpName = cursor.getString (cursor.getColumnIndex (DBHelper.S_SG_GRPNAME));
+                String grpName = cursor.getString (cursor
+                        .getColumnIndex (DBHelper.S_SG_GRPNAME));
                 Log.i ("--->", grpName);
-                
+
                 Intent selGrpIntent = new Intent ();
-                selGrpIntent.setClass (getActivity (), SingleGroupViewActivity.class);
+                selGrpIntent.setClass (getActivity (),
+                        SingleGroupViewActivity.class);
                 selGrpIntent.putExtra ("ServerName", serverName);
                 selGrpIntent.putExtra ("Port", port);
                 selGrpIntent.putExtra ("GroupName", grpName);
                 getActivity ().startActivity (selGrpIntent);
-                
+
             }
         }
     }
-
-    
 
     /**
      * Copies your database from your local assets-folder to the just created
@@ -211,8 +223,7 @@ public class SubscribedGroupFragment extends Fragment {
     @SuppressWarnings ("unused")
     private void copyDataBase (String dbname) throws IOException {
         // Open your local db as the input stream
-        InputStream myInput = context.getAssets ()
-                .open (dbname);
+        InputStream myInput = context.getAssets ().open (dbname);
         // Path to the just created empty db
         String outFileName = getString (R.string.db_path) + dbname;
         // Open the empty db as the output stream

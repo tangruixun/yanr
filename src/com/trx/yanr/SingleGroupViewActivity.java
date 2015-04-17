@@ -8,11 +8,14 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -46,7 +49,26 @@ public class SingleGroupViewActivity extends Activity {
     private HeaderDbOperator headDbOptr;
     private BodyDbOperator bodyDbOptr;
     private Cursor cursor;
+
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        if (bundle != null) {
+            outState = bundle;
+        }
+        super.onSaveInstanceState (outState);
+    }
     
+    @Override
+    protected void onPause () {
+        SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences (this);
+        Editor prefEditor = mySharedPreferences.edit ();
+        prefEditor.putString ("TempServerName", svrName);
+        prefEditor.putInt ("TempPort", port);
+        prefEditor.putString ("TempGroupName", grpName);
+        prefEditor.apply ();
+        super.onPause ();
+    }
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -54,12 +76,25 @@ public class SingleGroupViewActivity extends Activity {
         
         context = this;
         pDialog = new ProgressDialog (context);
-        
-        bundle = getIntent ().getExtras ();
-        svrName = bundle.getString ("ServerName");
-        port = bundle.getInt ("Port");
-        grpName = bundle.getString ("GroupName");
-        
+
+        if (bundle == null) {
+            if (savedInstanceState != null) {
+                bundle = savedInstanceState; // get saved bundle in onSaveInstanceState ()
+            } else {
+                bundle = getIntent ().getExtras ();
+            }
+        }
+
+        if (bundle != null) {
+            svrName = bundle.getString ("ServerName");
+            port = bundle.getInt ("Port");
+            grpName = bundle.getString ("GroupName");
+        } else {
+            SharedPreferences mySharedPreferences = PreferenceManager.getDefaultSharedPreferences (this);
+            svrName = mySharedPreferences.getString ("TempServerName", "");
+            port = mySharedPreferences.getInt ("TempPort", 119);
+            grpName = mySharedPreferences.getString ("TempGroupName", "");
+        }
         
         ActionBar actionBar = getActionBar ();
         actionBar.setTitle (grpName);
@@ -103,14 +138,16 @@ public class SingleGroupViewActivity extends Activity {
                             myGetBodyRunnable = new GetBodyRunnable (articleNo);
                             mGetBody_handler.post (myGetBodyRunnable);
                             
+                        } else { // go to NewsViewActivity directly
+                            dismissProDialog ();
+                            Intent newsIntent = new Intent ();
+                            newsIntent.setClass (context, NewsViewActivity.class);
+                            newsIntent.putExtra ("ArticleNo", articleNo);
+                            newsIntent.putExtra ("ServerName", svrName);
+                            newsIntent.putExtra ("Port", port);
+                            newsIntent.putExtra ("GroupName", grpName);
+                            startActivity (newsIntent);
                         }
-                        Intent newsIntent = new Intent ();
-                        newsIntent.setClass (context, NewsViewActivity.class);
-                        newsIntent.putExtra ("ArticleNo", articleNo);
-                        newsIntent.putExtra ("ServerName", svrName);
-                        newsIntent.putExtra ("Port", port);
-                        newsIntent.putExtra ("GroupName", grpName);
-                        startActivity (newsIntent);
                     }
                 }
             });
@@ -121,14 +158,23 @@ public class SingleGroupViewActivity extends Activity {
 
             @Override
             public boolean handleMessage (Message msg) {
-                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE 
-                        || msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
+                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE) {
                     dismissProDialog ();
                     cursor = headDbOptr.getAllRecordByGroup (grpName, svrName);
                     Cursor newCursor = cursor;
                     listItemAdapter.changeCursor (newCursor); // automatically closes old Cursor
                     listItemAdapter.mCursor = newCursor;
                     listItemAdapter.notifyDataSetChanged ();
+                } else if (msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
+                    dismissProDialog ();
+                    int articleNo = msg.arg1;
+                    Intent newsIntent = new Intent ();
+                    newsIntent.setClass (context, NewsViewActivity.class);
+                    newsIntent.putExtra ("ArticleNo", articleNo);
+                    newsIntent.putExtra ("ServerName", svrName);
+                    newsIntent.putExtra ("Port", port);
+                    newsIntent.putExtra ("GroupName", grpName);
+                    startActivity (newsIntent);
                 } else {
                     
                 }
@@ -163,7 +209,6 @@ public class SingleGroupViewActivity extends Activity {
         mGetHeader_handler.post (myGetHeaderRunnable);
     }
 
-    
     public class GetHeaderRunnable implements Runnable {
         private Handler handler;
         private NntpOpHelper newsOpHelper;
@@ -245,6 +290,7 @@ public class SingleGroupViewActivity extends Activity {
                 
                 msg = this.handler.obtainMessage ();
                 msg.what = MSG_RETRIEVE_BODYS_COMPLETE;
+                msg.arg1 = articleNo;
                 this.handler.sendMessage (msg);
             } catch (Exception e) {
                 e.printStackTrace();

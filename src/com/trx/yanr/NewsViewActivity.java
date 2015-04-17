@@ -94,4 +94,11 @@ public class NewsViewActivity extends Activity {
         return super.onOptionsItemSelected (item);
     }
 
+    @Override
+    protected void onDestroy () {
+        super.onDestroy ();
+    }
+    
+    
+
 }
