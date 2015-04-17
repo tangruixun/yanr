@@ -8,10 +8,15 @@ import java.util.List;
 import android.util.Log;
 import android.util.SparseArray;
 
-public class NewsOpHelper {
+public class NntpOpHelper {
+    
+    NNTPClientClass nntpclient;
         
+    public NntpOpHelper () {
+        nntpclient = new NNTPClientClass();
+    }
+
     NewsGroups retrieveAllGroups (String servername, int port) throws IOException, Exception {
-        NNTPClientClass nntpclient = new NNTPClientClass();
         List<String> messageHeaderList = new ArrayList<String>();
         NewsGroups newsgroups = new NewsGroups ();
         
@@ -33,12 +38,13 @@ public class NewsOpHelper {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            nntpclient.close ();
         }
         return newsgroups;
     }
     
     public String retrieveArticleNumbers (String servername, int port, String groupname) throws IOException, Exception {
-        NNTPClientClass nntpclient = new NNTPClientClass();
         String allArticlesNumber = "";
         try {
             Socket nntpSocket = nntpclient.connect (servername, port);
@@ -57,6 +63,8 @@ public class NewsOpHelper {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            nntpclient.close ();
         }
         return allArticlesNumber;
     }
@@ -82,7 +90,6 @@ public class NewsOpHelper {
 //    }
     
     public List <SparseArray<NNTPMessageHeader>> retrieveNewHeaders (String servername, int port, String groupname) throws IOException, Exception {
-        NNTPClientClass nntpclient = new NNTPClientClass();
         List <SparseArray<NNTPMessageHeader>> headerList= new ArrayList <SparseArray<NNTPMessageHeader>> ();
         try {
             
@@ -94,12 +101,13 @@ public class NewsOpHelper {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            nntpclient.close ();
         }
         return headerList;       
     }
     
     public List <SparseArray<NNTPMessageHeader>> retrieveAllHeaders (String servername, int port, String groupname) throws IOException, Exception {
-        NNTPClientClass nntpclient = new NNTPClientClass();
         List <SparseArray<NNTPMessageHeader>> headerList= new ArrayList <SparseArray<NNTPMessageHeader>> ();
         try {
             Socket nntpSocket = nntpclient.connect (servername, port);
@@ -114,13 +122,14 @@ public class NewsOpHelper {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            nntpclient.close ();
         }
         return headerList;
     }
 
     public String retrieveBodyText (String servername, int port, String grpName,
             int articleNo) throws IOException, Exception {
-        NNTPClientClass nntpclient = new NNTPClientClass();
         String bodyText = "";
         try {
             Socket nntpSocket = nntpclient.connect (servername, port);
@@ -135,6 +144,8 @@ public class NewsOpHelper {
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
+        } finally {
+            nntpclient.close ();
         }
         return bodyText;
     }

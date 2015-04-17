@@ -66,21 +66,6 @@ public class SingleGroupViewActivity extends Activity {
         actionBar.setDisplayShowTitleEnabled (true);
         actionBar.setDisplayHomeAsUpEnabled (true);
         
-        // TODO: display article title in this Group;
-        mUI_handler = new Handler (new Handler.Callback() {
-
-            @Override
-            public boolean handleMessage (Message msg) {
-                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE 
-                        || msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
-                    dismissProDialog ();
-                } else {
-                    
-                }
-                return true;
-            }
-        });
-        
         mGetHeader_thread = new HandlerThread ("GetGroupHeaders");
         mGetHeader_thread.start ();
         mGetHeader_handler = new Handler (mGetHeader_thread.getLooper ());
@@ -94,6 +79,7 @@ public class SingleGroupViewActivity extends Activity {
         headDbOptr.open ();
         bodyDbOptr.open ();
         cursor = headDbOptr.getAllRecordByGroup (grpName, svrName);
+
         if (cursor != null) {
             listItemAdapter = new SingleGroupViewAdapter (context, cursor,
                     SingleGroupViewAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
@@ -129,6 +115,26 @@ public class SingleGroupViewActivity extends Activity {
                 }
             });
         }
+        
+        // display article title in this Group;
+        mUI_handler = new Handler (new Handler.Callback() {
+
+            @Override
+            public boolean handleMessage (Message msg) {
+                if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE 
+                        || msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
+                    dismissProDialog ();
+                    cursor = headDbOptr.getAllRecordByGroup (grpName, svrName);
+                    Cursor newCursor = cursor;
+                    listItemAdapter.changeCursor (newCursor); // automatically closes old Cursor
+                    listItemAdapter.mCursor = newCursor;
+                    listItemAdapter.notifyDataSetChanged ();
+                } else {
+                    
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -145,17 +151,14 @@ public class SingleGroupViewActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId ();
         if (id == R.id.action_retrieve_articles) {
+            showProDialog(0, 100);
             getGroupArticleNumbers ();
-
             return true;
         }
         return super.onOptionsItemSelected (item);
     }
     
     private void getGroupArticleNumbers () {
-        showProDialog(0, 100);
-        
-
         myGetHeaderRunnable = new GetHeaderRunnable ();
         mGetHeader_handler.post (myGetHeaderRunnable);
     }
@@ -163,13 +166,13 @@ public class SingleGroupViewActivity extends Activity {
     
     public class GetHeaderRunnable implements Runnable {
         private Handler handler;
-        private NewsOpHelper newsOpHelper;
+        private NntpOpHelper newsOpHelper;
         Message msg;
 
         public GetHeaderRunnable () {
             super ();            
             this.handler = mUI_handler; // UI handler
-            newsOpHelper = new NewsOpHelper ();
+            newsOpHelper = new NntpOpHelper ();
         }        
 
         @Override
@@ -219,20 +222,20 @@ public class SingleGroupViewActivity extends Activity {
     public class GetBodyRunnable implements Runnable {
         private Handler handler;
         private int articleNo;
-        private NewsOpHelper newsOpHelper;
+        private NntpOpHelper nntpOpHelper;
 
         public GetBodyRunnable (int articleNumber) {
             super ();
             this.handler = mUI_handler; // UI handler
             articleNo = articleNumber;
-            newsOpHelper = new NewsOpHelper ();
+            nntpOpHelper = new NntpOpHelper ();
         }
 
         @Override
         public void run () {
             Message msg;
             try {
-                String articleBody = newsOpHelper.retrieveBodyText (svrName, port, grpName, articleNo);
+                String articleBody = nntpOpHelper.retrieveBodyText (svrName, port, grpName, articleNo);
                 
                 BodyDbOperator bodyDbOptr = new BodyDbOperator (context);
                 bodyDbOptr.open ();

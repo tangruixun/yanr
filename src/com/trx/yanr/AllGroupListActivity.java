@@ -150,12 +150,12 @@ public class AllGroupListActivity extends Activity {
     public class GetAllGroupsRunnable implements Runnable {
         
         private Handler handler;
-        private NewsOpHelper newsOpHelper;
+        private NntpOpHelper nntpOpHelper;
 
         public GetAllGroupsRunnable (Handler mUI_handler) {
             super ();
             this.handler = mUI_handler; // UI handler
-            newsOpHelper = new NewsOpHelper ();
+            nntpOpHelper = new NntpOpHelper ();
 
         }
 
@@ -163,7 +163,7 @@ public class AllGroupListActivity extends Activity {
         public void run () {
             Message msg;
             try {
-                allnewsgroups = newsOpHelper.retrieveAllGroups (servername, port);
+                allnewsgroups = nntpOpHelper.retrieveAllGroups (servername, port);
                 
                 for (String group : allnewsgroups.groups) {
                     Log.i ("--->", group);

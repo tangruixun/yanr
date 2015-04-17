@@ -23,4 +23,8 @@
     <string name="pleasewaitlong">Waiting for retrieving complete&#8230;</string>
     <string name="title_activity_news_view">News</string>
     <string name="pressagain">Press again to exit</string>
+    <string name="rebuildtables">Clear all data</string>
+    <string name="warning">Warning</string>
+    <string name="rebuild_alert">Clear all data, continue?</string>
+    <string name="action_refresh">Refresh</string>
 </resources>

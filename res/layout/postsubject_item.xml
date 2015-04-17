@@ -13,27 +13,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        android:textSize="26sp" >
+        android:textSize="18sp" >
     </TextView>
-    
-    <TextView
-        android:id="@+id/PostDateTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="6dp"
-        android:textSize="12sp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true" >
-    </TextView>
-        
+
     <TextView
         android:id="@+id/PostFrom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/PostSubject"
         android:layout_margin="6dp"
-        android:textSize="12sp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true" >
+        android:textSize="12sp" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/PostDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/PostFrom"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="6dp"
+        android:textSize="12sp" >
     </TextView>
 
 </RelativeLayout>

@@ -47,15 +47,18 @@
         </activity>
         <activity
             android:name=".AllGroupListActivity"
-            android:label="@string/title_activity_subscribe" >
+            android:label="@string/title_activity_subscribe"
+            android:parentActivityName="com.trx.yanr.MainActivity" >
         </activity>
         <activity
             android:name=".SingleGroupViewActivity"
-            android:label="@string/title_activity_single_group_view" >
+            android:label="@string/title_activity_single_group_view"
+            android:parentActivityName="com.trx.yanr.MainActivity"  >
         </activity>
         <activity
             android:name=".NewsViewActivity"
-            android:label="@string/title_activity_news_view" >
+            android:label="@string/title_activity_news_view"
+            android:parentActivityName="com.trx.yanr.SingleGroupViewActivity"  >
         </activity>
     </application>
 

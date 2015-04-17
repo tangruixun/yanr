@@ -58,6 +58,12 @@ public class NNTPClientClass {
 		return 0;
 	}
 	
+	void close () throws IOException {
+	    nntpclientsocket.close ();
+        in = null;
+        out = null;
+	}
+	
 	int sendCommand(String cmd) throws IOException {
 		Log.i("--->", "Sending command \"" + cmd + "\"...");
 	    out.write(cmd + "\r\n");

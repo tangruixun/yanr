@@ -2,23 +2,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.trx.yanr.MainActivity" >
 
-
-    
     <item
         android:id="@+id/action_groupsubscribe"
-        android:showAsAction="ifRoom"
         android:icon="@drawable/ic_add"
         android:orderInCategory="100"
+        android:showAsAction="ifRoom"
         android:title="@string/action_groupsubscribe"/>
-    <item
+    <!--
+         item
         android:id="@+id/action_example"
         android:showAsAction="ifRoom"
-        android:title="@string/action_example"/>
+        android:orderInCategory="102"
+        android:title="@string/action_example"/
+    -->
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_refresh"
+        android:orderInCategory="102"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_refresh"/>
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
-        android:orderInCategory="109"
+        android:orderInCategory="103"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
+    <item
+        android:id="@+id/action_rebuilddb"
+        android:icon="@drawable/ic_bug"
+        android:orderInCategory="105"
+        android:showAsAction="collapseActionView"
+        android:title="@string/rebuildtables"/>
 
 </menu>

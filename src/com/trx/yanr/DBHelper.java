@@ -104,4 +104,14 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate (db);
     }
 
+    public void onRebuild () {
+        SQLiteDatabase db = getWritableDatabase ();
+        db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
+        db.execSQL ("DROP TABLE IF EXISTS " + HEADER_TABLE);
+        db.execSQL ("DROP TABLE IF EXISTS " + BODY_TABLE);
+
+        
+        onCreate (db);
+    }
+
 }
