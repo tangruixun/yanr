@@ -306,7 +306,102 @@ public class NNTPClientClass {
 
     }
 
-	List <SparseArray<NNTPMessageHeader>> displayNewsgroupHeadsWithRawReturn (String group)
+
+    public int displayNewNewsgroupHeadsWithRawReturnAndSaveDb (HeaderDbOperator headerDbOptr, String group, 
+                String server, int lastArticleNoinDb) throws IOException {
+        
+        String [] returnArray = {};
+        int articleId = 0;
+
+        try {
+            int rst = sendCommand ("GROUP " + group);
+
+            if (rst > 299) {
+                throw new ZNewsCommandException ();
+            }
+            Log.i ("--->", group);
+        } catch (ZNewsCommandException e) {
+            Log.i ("--->", "Error: could not access newsgroup \"" + group
+                    + "\".");
+            return -1;
+        } catch (IOException e) {
+            Log.i ("--->", e.getMessage ());
+            return -2;
+        }
+        
+        StringTokenizer st = new StringTokenizer (buffer, " ");
+        st.nextToken ();
+        int totalArticleNumber = Integer.valueOf ( (st.nextToken ()));
+        int firstArticleNumber = Integer.valueOf ( (st.nextToken ()));
+        int lastArticleNumber = Integer.valueOf ( (st.nextToken ()));
+        Log.i ("---> Total articles #", " " + totalArticleNumber);
+        Log.i ("---> First article #", " " + firstArticleNumber);
+        Log.i ("---> Last article #", " " + lastArticleNumber);
+        
+        if (lastArticleNoinDb >= lastArticleNumber) {
+            // no new news in this group, nothing need to do.
+            return 0;
+        } 
+        
+        int i = lastArticleNumber;
+        int t = 0;
+        
+        while (i >= firstArticleNumber) {
+            NNTPMessageHeader message_headers = new NNTPMessageHeader ();
+            try {
+                String firstLine = sendCommandRawReturn ("HEAD " + String.valueOf (i));
+                String strRtnCode = firstLine.substring(0, 3);
+
+                if (firstLine.charAt (0) != '2') {
+                    Log.i ("--->", firstLine);
+                    Log.i ("--->", "error code " + strRtnCode);
+                    
+                    int rst = Integer.parseInt(strRtnCode); 
+                    if (rst > 299) {
+                        i--;
+                        continue; // no article of this article number, try next one
+                    }
+                } else {
+                    Log.i ("--->", strRtnCode);
+                    returnArray = firstLine.split (" ");
+                    articleId = Integer.parseInt (returnArray [1]); // now ID
+                    Log.i ("--->", group);
+                    Log.i ("--->", articleId + "");
+                }
+
+                
+                /////////////////////////////////////////////////////////////////////////////
+                
+                String tmp = getTextResponse ();
+
+                InputStream is = new ByteArrayInputStream (tmp.getBytes ());
+                MessageHeaders headers = new MessageHeaders (is);
+
+                Enumeration <Header> en = headers.getAllHeaders ();
+                while (en.hasMoreElements ()) {
+                    Header h = (Header) en.nextElement ();
+                    message_headers.setHeader (h.getName (), h.getValue ()); // set all headers of one single message
+                }
+
+                //idHeaderMap.put (articleId, message_headers); // TODO: need fix to save to db;
+                headerDbOptr.createRecord (group, server, articleId, message_headers);
+                t++;
+                if (t >= totalArticleNumber) {
+                    return 0;
+                }
+            } catch (Throwable e) {
+                Log.i ("--->", e.getMessage ());
+                // there's been a problem with the current article, let's try to
+                // get the next one
+            }
+
+            i--;
+        }
+        
+        return 0;
+    }    
+    
+	List <SparseArray<NNTPMessageHeader>> displayAllNewsgroupHeadsWithRawReturn (String group)
             throws IOException {
 
         List <SparseArray<NNTPMessageHeader>> headerList = new ArrayList <SparseArray<NNTPMessageHeader>> (); // all headers
@@ -492,9 +587,6 @@ public class NNTPClientClass {
             int articleNo) {
         
     }
-	  
-
-	  
 		
 //		if (nntpclientsocket != null && in != null && out != null) {
 //            try {

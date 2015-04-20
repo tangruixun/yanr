@@ -161,6 +161,32 @@ public class HeaderDbOperator {
         }
         return false;
     }
+
+    public int getLatestArticleNoinDb (String grpName, String svrName) {
+        Cursor c = null;
+        int articleNo = 0;
+        String strSQL = "SELECT * FROM " + DBHelper.HEADER_TABLE 
+                + " WHERE "+ DBHelper.S_H_ARTICLENO 
+                + " = (SELECT MAX (" 
+                + DBHelper.S_H_ARTICLENO 
+                + ") FROM " + DBHelper.HEADER_TABLE + " WHERE "
+                + DBHelper.S_H_GRPNAME + " = '" + grpName 
+                + "' AND " + DBHelper.S_H_SVRNAME + " = '" + svrName + "') AND "
+                + DBHelper.S_H_GRPNAME + " = '" + grpName 
+                + "' AND " + DBHelper.S_H_SVRNAME + " = '" + svrName + "'";
+        try {
+            c = database.rawQuery (strSQL, null);
+            if (c != null) {
+                if (c.getCount () > 0) {
+                    c.moveToFirst ();
+                    articleNo = c.getInt (c.getColumnIndex (DBHelper.S_H_ARTICLENO));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return articleNo;
+    }
 }
 
 

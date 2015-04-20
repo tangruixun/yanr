@@ -31,6 +31,8 @@ public class SingleGroupViewActivity extends Activity {
 
     private final static int MSG_RETRIEVE_HEADERS_COMPLETE = 1;
     private final static int MSG_RETRIEVE_BODYS_COMPLETE = 2;
+    private final static int MSG_RETRIEVE_HEADERS_INCOMPLETE = 3;
+    
     
     private Handler mUI_handler;
     private Handler mGetHeader_handler, mGetBody_handler;
@@ -176,8 +178,8 @@ public class SingleGroupViewActivity extends Activity {
                     newsIntent.putExtra ("Port", port);
                     newsIntent.putExtra ("GroupName", grpName);
                     startActivity (newsIntent);
-                } else {
-
+                } else if (msg.what == MSG_RETRIEVE_HEADERS_INCOMPLETE) {
+                    // some error happened
 
                 }
                 return true;
@@ -213,36 +215,53 @@ public class SingleGroupViewActivity extends Activity {
 
     public class GetHeaderRunnable implements Runnable {
         private Handler handler;
-        private NntpOpHelper newsOpHelper;
+        private NntpOpHelper nntpOpHelper;
         Message msg;
 
         public GetHeaderRunnable () {
             super ();            
             this.handler = mUI_handler; // UI handler
-            newsOpHelper = new NntpOpHelper ();
+            nntpOpHelper = new NntpOpHelper ();
         }        
 
         @Override
         public void run () {
 
             try {
-                // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
-                List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
                 HeaderDbOperator headerDbOptr = new HeaderDbOperator (context);
                 //HeaderDbOperator headerDbOptr = new HeaderDbOperator (context);
                 headerDbOptr.open ();
-                for (SparseArray <NNTPMessageHeader> idHeaderMap : headerList) {
-                    
-                    int articleNo;
-                    NNTPMessageHeader headers;
-                    articleNo = idHeaderMap.keyAt (0);
-                    Log.i ("--->", articleNo + "");
-                    headers = idHeaderMap.get (articleNo);
-
-                    if (!headerDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
-                        headerDbOptr.createRecord (grpName, svrName, articleNo, headers);
-                    }
+                // get latest Article number in the database by group name
+                int lastArticleNoinDb = headerDbOptr.getLatestArticleNoinDb (grpName, svrName);
+                
+                // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
+                // TODO: need fix to only retrieving new headers
+                //List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
+                int getRusult = nntpOpHelper.retrieveNewHeaders (headerDbOptr, svrName, port, grpName, lastArticleNoinDb);
+                
+                if (getRusult == 0) {
+                    msg = this.handler.obtainMessage ();
+                    msg.what = MSG_RETRIEVE_HEADERS_COMPLETE;
+                    this.handler.sendMessage (msg);
+                } else {
+                    msg = this.handler.obtainMessage ();
+                    msg.what = MSG_RETRIEVE_HEADERS_INCOMPLETE;
+                    this.handler.sendMessage (msg);
                 }
+
+
+//                for (SparseArray <NNTPMessageHeader> idHeaderMap : newHeaderList) {
+//                    
+//                    int articleNo;
+//                    NNTPMessageHeader headers;
+//                    articleNo = idHeaderMap.keyAt (0);
+//                    Log.i ("--->", articleNo + "");
+//                    headers = idHeaderMap.get (articleNo);
+//
+//                    if (!headerDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
+//                        headerDbOptr.createRecord (grpName, svrName, articleNo, headers);
+//                    }
+//                }
 
 //                String [] everyLinesArray = allArticleNumbers.split ("\\r?\\n");
 //                ArticleNoDbOperator artlNoDbOptr = new ArticleNoDbOperator (context);
@@ -255,9 +274,7 @@ public class SingleGroupViewActivity extends Activity {
 //                    }
 //                }
                 
-                msg = this.handler.obtainMessage ();
-                msg.what = MSG_RETRIEVE_HEADERS_COMPLETE;
-                this.handler.sendMessage (msg);
+
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception e) {

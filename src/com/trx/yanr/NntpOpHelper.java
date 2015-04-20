@@ -89,22 +89,30 @@ public class NntpOpHelper {
 //        return headerText;
 //    }
     
-    public List <SparseArray<NNTPMessageHeader>> retrieveNewHeaders (String servername, int port, String groupname) throws IOException, Exception {
-        List <SparseArray<NNTPMessageHeader>> headerList= new ArrayList <SparseArray<NNTPMessageHeader>> ();
+    public int retrieveNewHeaders (HeaderDbOperator headerDbOptr, String servername, int port, String groupname, int lastArticleNoinDb) 
+            throws IOException, Exception {
+        int r = -1;
         try {
-            
-            
-            
-            
-            
-            
+            Socket nntpSocket = nntpclient.connect (servername, port);
+
+            if (nntpSocket != null && nntpclient.in != null && nntpclient.out != null) {
+                Log.i("--->", "connect successful");
+                int i = nntpclient.open();
+                if (i != 0) {
+                    Log.i("open () error!!! Error: news server not found. --->", "" + i);
+                    r = -1;
+                    return r;
+                }
+            }
+            r = nntpclient.displayNewNewsgroupHeadsWithRawReturnAndSaveDb (headerDbOptr, groupname, servername, lastArticleNoinDb);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         } finally {
             nntpclient.close ();
         }
-        return headerList;       
+        return r;
     }
     
     public List <SparseArray<NNTPMessageHeader>> retrieveAllHeaders (String servername, int port, String groupname) throws IOException, Exception {
@@ -117,7 +125,7 @@ public class NntpOpHelper {
                 if (i != 0) {
                     Log.i("open () error!!! Error: news server not found. --->", "" + i);
                 }
-                headerList = nntpclient.displayNewsgroupHeadsWithRawReturn (groupname);
+                headerList = nntpclient.displayAllNewsgroupHeadsWithRawReturn (groupname);
             }
         } catch (Exception e) {
             e.printStackTrace();
