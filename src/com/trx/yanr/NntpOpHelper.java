@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -89,7 +90,13 @@ public class NntpOpHelper {
 //        return headerText;
 //    }
     
-    public int retrieveNewHeaders (HeaderDbOperator headerDbOptr, String servername, int port, String groupname, int lastArticleNoinDb) 
+    public int retrieveNewHeaders (HeaderDbOperator headerDbOptr, 
+            String servername, 
+            int port, 
+            String 
+            groupname, 
+            int lastArticleNoinDb,
+            Handler handler) 
             throws IOException, Exception {
         int r = -1;
         try {
@@ -104,7 +111,11 @@ public class NntpOpHelper {
                     return r;
                 }
             }
-            r = nntpclient.displayNewNewsgroupHeadsWithRawReturnAndSaveDb (headerDbOptr, groupname, servername, lastArticleNoinDb);
+            r = nntpclient.displayNewNewsgroupHeadsWithRawReturnAndSaveDb (headerDbOptr, 
+                    groupname, 
+                    servername, 
+                    lastArticleNoinDb,
+                    handler);
 
         } catch (Exception e) {
             e.printStackTrace();

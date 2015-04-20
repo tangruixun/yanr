@@ -16,12 +16,15 @@ import java.util.StringTokenizer;
 
 import javax.mail.Header;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.util.SparseArray;
 
 import com.sun.mail.dsn.MessageHeaders;
 
 public class NNTPClientClass {
+    
 	Socket nntpclientsocket; 
 	BufferedReader in; 
 	BufferedWriter out;
@@ -308,11 +311,10 @@ public class NNTPClientClass {
 
 
     public int displayNewNewsgroupHeadsWithRawReturnAndSaveDb (HeaderDbOperator headerDbOptr, String group, 
-                String server, int lastArticleNoinDb) throws IOException {
+                String server, int lastArticleNoinDb, Handler handler) throws IOException {
         
         String [] returnArray = {};
         int articleId = 0;
-
         try {
             int rst = sendCommand ("GROUP " + group);
 
@@ -337,7 +339,7 @@ public class NNTPClientClass {
         Log.i ("---> Total articles #", " " + totalArticleNumber);
         Log.i ("---> First article #", " " + firstArticleNumber);
         Log.i ("---> Last article #", " " + lastArticleNumber);
-        
+
         if (lastArticleNoinDb >= lastArticleNumber) {
             // no new news in this group, nothing need to do.
             return 0;
@@ -345,8 +347,14 @@ public class NNTPClientClass {
         
         int i = lastArticleNumber;
         int t = 0;
+
+        Message msg;
+
+        int progbarNum = ((lastArticleNumber - lastArticleNoinDb) > totalArticleNumber) ? totalArticleNumber : (lastArticleNumber - lastArticleNoinDb);
         
         while (i >= firstArticleNumber) {
+            msg = handler.obtainMessage ();
+            msg.arg2 = progbarNum;
             NNTPMessageHeader message_headers = new NNTPMessageHeader ();
             try {
                 String firstLine = sendCommandRawReturn ("HEAD " + String.valueOf (i));
@@ -383,9 +391,13 @@ public class NNTPClientClass {
                     message_headers.setHeader (h.getName (), h.getValue ()); // set all headers of one single message
                 }
 
-                //idHeaderMap.put (articleId, message_headers); // TODO: need fix to save to db;
-                headerDbOptr.createRecord (group, server, articleId, message_headers);
+                headerDbOptr.createRecord (group, server, articleId, message_headers); // save to db;
                 t++;
+                // update progress bar
+                msg.what = SingleGroupViewActivity.MSG_RETRIEVE_HEADERS_PROGRESS;
+                msg.arg1 = t;
+                handler.sendMessage (msg);
+
                 if (t >= totalArticleNumber) {
                     return 0;
                 }

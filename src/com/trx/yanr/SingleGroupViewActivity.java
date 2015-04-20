@@ -1,7 +1,6 @@
 package com.trx.yanr;
 
 import java.io.IOException;
-import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -17,7 +16,6 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +30,7 @@ public class SingleGroupViewActivity extends Activity {
     private final static int MSG_RETRIEVE_HEADERS_COMPLETE = 1;
     private final static int MSG_RETRIEVE_BODYS_COMPLETE = 2;
     private final static int MSG_RETRIEVE_HEADERS_INCOMPLETE = 3;
+    public final static int MSG_RETRIEVE_HEADERS_PROGRESS = 5;
     
     
     private Handler mUI_handler;
@@ -136,7 +135,7 @@ public class SingleGroupViewActivity extends Activity {
                         int articleNo = cursor.getInt (cursor.getColumnIndex (DBHelper.S_H_ARTICLENO));
                         if (!bodyDbOptr.isNumberExisted (grpName, svrName, articleNo)) {
                             // record not exist in Body Table
-                            showProDialog (0, 100);
+                            showProDialog (0, 100, 100);
                             myGetBodyRunnable = new GetBodyRunnable (articleNo);
                             mGetBody_handler.post (myGetBodyRunnable);
                             
@@ -181,6 +180,9 @@ public class SingleGroupViewActivity extends Activity {
                 } else if (msg.what == MSG_RETRIEVE_HEADERS_INCOMPLETE) {
                     // some error happened
 
+                } else if (msg.what == MSG_RETRIEVE_HEADERS_PROGRESS) {
+                    // progress bar animation
+                    showProDialog (1, msg.arg1, msg.arg2);
                 }
                 return true;
             }
@@ -201,7 +203,7 @@ public class SingleGroupViewActivity extends Activity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId ();
         if (id == R.id.action_retrieve_articles) {
-            showProDialog(0, 100);
+            showProDialog(1, 100, 100);
             getGroupArticleNumbers ();
             return true;
         }
@@ -237,7 +239,7 @@ public class SingleGroupViewActivity extends Activity {
                 // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
                 // TODO: need fix to only retrieving new headers
                 //List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
-                int getRusult = nntpOpHelper.retrieveNewHeaders (headerDbOptr, svrName, port, grpName, lastArticleNoinDb);
+                int getRusult = nntpOpHelper.retrieveNewHeaders (headerDbOptr, svrName, port, grpName, lastArticleNoinDb, handler);
                 
                 if (getRusult == 0) {
                     msg = this.handler.obtainMessage ();
@@ -342,7 +344,7 @@ public class SingleGroupViewActivity extends Activity {
 
     // style
     // process
-    private void showProDialog (int style, int process) {
+    private void showProDialog (int style, int process, int max) {
         // Showing progress dialog
         pDialog.setTitle(getString (R.string.pleasewait));
         pDialog.setMessage (getString (R.string.pleasewaitlong));
@@ -352,7 +354,7 @@ public class SingleGroupViewActivity extends Activity {
         } else {
             pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             pDialog.setIndeterminate(false);
-            pDialog.setMax(100);
+            pDialog.setMax(max);
         }
         pDialog.setCancelable (false);
         if (process == 0) {

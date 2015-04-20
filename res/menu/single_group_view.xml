@@ -8,5 +8,12 @@
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_get"
         android:title="@string/action_retrieve_articles"/>
-
+    
+    <item
+        android:id="@+id/action_retrieve_all_articles"
+        android:orderInCategory="101"
+        android:showAsAction="never"
+        android:icon="@drawable/ic_get"
+        android:title="@string/action_retrieve_all_articles"/>
+    
 </menu>
