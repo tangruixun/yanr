@@ -36,6 +36,39 @@ public class DBHelper extends SQLiteOpenHelper {
     public final static String S_B_ARTICLENO = "s_ArticleNumber";
     public final static String S_B_BODYTEXT = "s_BodyText";
     
+    public final static String SERVER_TABLE = "Server";
+    public final static String S_SRV_ID = "_id";
+    public final static String S_SRV_ADDR = "s_Address";
+    public final static String S_SRV_PORT = "s_Port";
+    public final static String S_SRV_SRVUSRNAME = "s_ServerUsername";
+    public final static String S_SRV_SRVPWD = "s_ServerPassword";
+    public final static String S_SRV_LOGINREQ = "s_LoginRequired";
+    public final static String S_SRV_MYNICK = "s_MyNickname";
+    public final static String S_SRV_MYEMAIL = "s_MyEmail";
+    public final static String S_SRV_MYORG = "s_MyOrg";
+    public final static String S_SRV_MYFACE = "s_MyFace";
+    public final static String S_SRV_MYXFACE = "s_MyXFace";
+    public final static String S_SRV_SSLREQ = "s_SslRequired";
+    public final static String S_SRV_TimeOut = "s_TimeOut";
+    
+    private final static String createServerTableSQL = "CREATE TABLE "
+            + SERVER_TABLE
+            + " ("
+            + S_SRV_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + S_SRV_ADDR + " NVARCHAR(256), "
+            + S_SRV_PORT + " INT DEFAULT 119, "
+            + S_SRV_SRVUSRNAME + " NVARCHAR(256), "
+            + S_SRV_SRVPWD + " NVARCHAR(256), "
+            + S_SRV_LOGINREQ + " BOOLEAN DEFAULT 0, "
+            + S_SRV_MYNICK + " NVARCHAR(256), "
+            + S_SRV_MYEMAIL + " NVARCHAR(256), "
+            + S_SRV_MYORG + " NVARCHAR(256), "
+            + S_SRV_MYFACE + " NVARCHAR(4096), "            
+            + S_SRV_MYXFACE + " NVARCHAR(4096), "
+            + S_SRV_SSLREQ + " BOOLEAN DEFAULT 0, "
+            + S_SRV_TimeOut + " INT DEFAULT 60000"
+            + ")";
+    
     private final static String createBodyTableSQL = "CREATE TABLE "
             + BODY_TABLE
             + " ("
@@ -87,6 +120,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate (SQLiteDatabase db) {
         Log.i ("--->", "create database");
+        db.execSQL (createServerTableSQL);
         db.execSQL (createSubscribedGroupTableSQL);
         db.execSQL (createHeaderTableSQL);
         db.execSQL (createBodyTableSQL);
@@ -101,11 +135,13 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL ("DROP TABLE IF EXISTS " + BODY_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + HEADER_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
+        db.execSQL ("DROP TABLE IF EXISTS " + SERVER_TABLE);
         onCreate (db);
     }
 
     public void onRebuild () {
         SQLiteDatabase db = getWritableDatabase ();
+        db.execSQL ("DROP TABLE IF EXISTS " + SERVER_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + HEADER_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + BODY_TABLE);

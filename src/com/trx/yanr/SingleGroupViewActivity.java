@@ -237,8 +237,8 @@ public class SingleGroupViewActivity extends Activity {
                 int lastArticleNoinDb = headerDbOptr.getLatestArticleNoinDb (grpName, svrName);
                 
                 // String allArticleNumbers = newsOpHelper.retrieveArticleNumbers (svrName, port, grpName);
-                // TODO: need fix to only retrieving new headers
                 //List <SparseArray<NNTPMessageHeader>> headerList = newsOpHelper.retrieveAllHeaders (svrName, port, grpName);
+                // only retrieving new headers
                 int getRusult = nntpOpHelper.retrieveNewHeaders (headerDbOptr, svrName, port, grpName, lastArticleNoinDb, handler);
                 
                 if (getRusult == 0) {

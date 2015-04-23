@@ -60,6 +60,12 @@
             android:label="@string/title_activity_news_view"
             android:parentActivityName="com.trx.yanr.SingleGroupViewActivity" >
         </activity>
+        
+        <activity
+            android:name=".SettingPrefActivity"
+            android:label="@string/title_activity_ServerSettingPrefActivity"
+            android:parentActivityName="com.trx.yanr.SingleGroupViewActivity" >
+        </activity>
     </application>
 
 </manifest>

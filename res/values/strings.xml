@@ -28,4 +28,11 @@
     <string name="warning">Warning</string>
     <string name="rebuild_alert">Clear all data, continue?</string>
     <string name="action_refresh">Refresh</string>
+    <string name="ic_settings_applications">Settings</string>
+    <string name="title_activity_ServerSettingPrefActivity">Settings</string>
+    <string name="action_addserver">Add Server</string>
+    
+    <string name="settings_serverssettingtitle">Server Settings</string>
+    <string name="settings_serverssettingsummary">Edit server settings</string>
+    <string name="settings_serverslisttitle">Server List</string>
 </resources>

@@ -144,6 +144,9 @@ public class SubscribedGroupFragment extends Fragment {
 
         case R.id.action_settings:
             // return true;
+            Intent settingIntent = new Intent ();
+            settingIntent.setClass (context, SettingPrefActivity.class);
+            this.startActivity (settingIntent);
             break;
 
         case R.id.action_rebuilddb:

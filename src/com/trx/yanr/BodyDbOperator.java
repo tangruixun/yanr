@@ -11,7 +11,7 @@ public class BodyDbOperator {
 
     private SQLiteDatabase database;
     private DBHelper bodyDbHelper;
-    public String [] allColumns = { DBHelper.S_B_GRPNAME, DBHelper.S_B_SVRNAME, 
+    public String [] allColumns = { DBHelper.S_B_ID, DBHelper.S_B_GRPNAME, DBHelper.S_B_SVRNAME, 
             DBHelper.S_B_ARTICLENO, DBHelper.S_B_BODYTEXT };
     
     public BodyDbOperator (Context context) {
