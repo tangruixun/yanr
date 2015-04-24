@@ -31,8 +31,18 @@ public class ServerSettingsFragment extends PreferenceFragment {
 
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
-
+        switch (item.getItemId ()) {
+        case R.id.add_server:
+            showAddServerDlg ();
+            break;
+        default:
+            break;
+        }
         return super.onOptionsItemSelected (item);
+    }
+
+    private void showAddServerDlg () {
+        NewServerDialog newSvrDlg = new NewServerDialog (getActivity());
     }
     
     

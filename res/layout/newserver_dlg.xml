@@ -1,0 +1,195 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/serveraddrdes" />
+
+            <EditText
+                android:id="@+id/serveraddr"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/serveraddrhint"
+                android:inputType="textUri" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/serverportdes" />
+
+            <EditText
+                android:id="@+id/serverport"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/serverporthint"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <CheckBox
+            android:id="@+id/logincheckbox"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/logincheckboxdes" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/serverusernamedes" />
+
+            <EditText
+                android:id="@+id/serverusername"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/serverusernamehint" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/serverpwddes" />
+
+            <EditText
+                android:id="@+id/serverpwd"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/serverpwdhint"
+                android:inputType="textPassword" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/mynickdes" />
+
+            <EditText
+                android:id="@+id/mynick"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/mynickhint" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/myemaildes" />
+
+            <EditText
+                android:id="@+id/myemail"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/myemailhint"
+                android:inputType="textEmailAddress" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/myorgdes" />
+
+            <EditText
+                android:id="@+id/myorg"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/myorghint" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/myfacedes" />
+
+            <EditText
+                android:id="@+id/myface"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/myfacehint" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/myxfacedes" />
+
+            <EditText
+                android:id="@+id/myxface"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="@string/myxfacehint" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <CheckBox
+            android:id="@+id/sslcheckbox"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sslcheckboxdes" />
+    </LinearLayout>
+
+</ScrollView>

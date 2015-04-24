@@ -35,4 +35,24 @@
     <string name="settings_serverssettingtitle">Server Settings</string>
     <string name="settings_serverssettingsummary">Edit server settings</string>
     <string name="settings_serverslisttitle">Server List</string>
+    <string name="serveraddrdes">Server Address: </string>
+    <string name="serveraddrhint">Input server address</string>
+    <string name="serverportdes">Port: </string>
+    <string name="serverporthint">Port number</string>
+    <string name="logincheckboxdes">Server need login</string>
+    <string name="serverusernamedes">User Name:</string>
+    <string name="serverusernamehint">My username on server</string>
+    <string name="serverpwddes">Password: </string>
+    <string name="serverpwdhint">My password on server</string>
+    <string name="mynickdes">My nick name: </string>
+    <string name="mynickhint">Input nick name</string>
+    <string name="myemaildes">Email:</string>
+    <string name="myemailhint">Input email</string>
+    <string name="myorgdes">Orgnization: </string>
+    <string name="myorghint">Input orgnization</string>
+    <string name="myfacedes">Face: </string>
+    <string name="myfacehint">Input Face string</string>  
+    <string name="myxfacedes">X-Face: </string>
+    <string name="myxfacehint">Input X-Face string</string>
+    <string name="sslcheckboxdes">SSL required</string>
 </resources>

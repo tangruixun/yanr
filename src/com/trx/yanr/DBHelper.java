@@ -49,7 +49,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public final static String S_SRV_MYFACE = "s_MyFace";
     public final static String S_SRV_MYXFACE = "s_MyXFace";
     public final static String S_SRV_SSLREQ = "s_SslRequired";
-    public final static String S_SRV_TimeOut = "s_TimeOut";
+    public final static String S_SRV_TIMEOUT = "s_TimeOut";
     
     private final static String createServerTableSQL = "CREATE TABLE "
             + SERVER_TABLE
@@ -66,7 +66,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + S_SRV_MYFACE + " NVARCHAR(4096), "            
             + S_SRV_MYXFACE + " NVARCHAR(4096), "
             + S_SRV_SSLREQ + " BOOLEAN DEFAULT 0, "
-            + S_SRV_TimeOut + " INT DEFAULT 60000"
+            + S_SRV_TIMEOUT + " INT DEFAULT 60000"
             + ")";
     
     private final static String createBodyTableSQL = "CREATE TABLE "
