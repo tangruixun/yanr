@@ -8,13 +8,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 public class ServerSettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         addPreferencesFromResource (R.xml.fragmented_preferences);
+        //ListView serverListV = (ListView) v.findViewById (R.id.);
     }
+
+
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,

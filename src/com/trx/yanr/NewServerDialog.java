@@ -16,7 +16,7 @@ public final class NewServerDialog extends Dialog implements OnClickListener {
     Context context;
     EditText svrAddrV, svrPortV, svrUsranemV, svrPwdV, nickNameV, emailV, orgV, faceV, xfaceV;
     CheckBox loginReqV, sslReqV;
-    Button btnV;
+    Button savBtnV;
 
     public NewServerDialog (Context _context) {
         super (_context);
@@ -39,7 +39,7 @@ public final class NewServerDialog extends Dialog implements OnClickListener {
         xfaceV = (EditText) findViewById (R.id.myxface);
         loginReqV = (CheckBox) findViewById (R.id.logincheckbox);
         sslReqV = (CheckBox) findViewById (R.id.sslcheckbox);
-        btnV = (Button) findViewById (R.id.savebutton);
+        savBtnV = (Button) findViewById (R.id.savebutton);
         
         loginReqV.setOnCheckedChangeListener (new OnCheckedChangeListener() {
             
@@ -60,12 +60,51 @@ public final class NewServerDialog extends Dialog implements OnClickListener {
             }
         });
         
-        
+        savBtnV.setOnClickListener (this);
+
     }
 
     @Override
     public void onClick (View v) {
-        
+        switch (v.getId ()) {
+        case R.id.savebutton:
+            ServerData serverData = new ServerData ();
+            ServerDbOperator svrDbOptr = new ServerDbOperator (context);
+            svrDbOptr.open ();
+            
+            String strAddr = svrAddrV.getText ().toString ().trim ();
+            String strPort = svrPortV.getText ().toString ().trim ();
+            String strSvrUsrName = svrUsranemV.getText ().toString ();
+            String strSvrPwd = svrPwdV.getText ().toString ();
+            String strNick = nickNameV.getText ().toString ().trim ();
+            String strEmail = emailV.getText ().toString ().trim ();
+            String strOrg = orgV.getText ().toString ().trim ();
+            String strFace = faceV.getText ().toString ().trim ();
+            String strXface = xfaceV.getText ().toString ().trim ();
+            Boolean bLogReq = loginReqV.isChecked ();
+            Boolean bSslReq = sslReqV.isChecked ();
+            
+            serverData.setAddress (strAddr);
+            serverData.setPort (strPort);
+            serverData.setServerusername (strSvrUsrName);
+            serverData.setServerpassword (strSvrPwd);
+            serverData.setLoginrequired (bLogReq);
+            serverData.setMynickname (strNick);
+            serverData.setMyemail (strEmail);
+            serverData.setMyorganization (strOrg);
+            serverData.setMyface (strFace);
+            serverData.setMyxface (strXface);
+            serverData.setSslrequired (bSslReq);
+            
+            if (!strAddr.equals ("") && !strPort.equals ("")) {
+                svrDbOptr.createRecord (serverData);
+            }
+            dismiss ();
+            break;
+
+        default:
+            break;
+        }
     }
 
 }

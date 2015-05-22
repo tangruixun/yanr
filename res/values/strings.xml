@@ -56,4 +56,6 @@
     <string name="myxfacehint">Input X-Face string</string>
     <string name="sslcheckboxdes">SSL required</string>
     <string name="action_save">Save</string>
+    <string name="defaultserver">nntp.aioe.org</string>
+    <string name="defaultport">119</string>
 </resources>

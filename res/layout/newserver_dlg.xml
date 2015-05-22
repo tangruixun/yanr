@@ -26,7 +26,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/serveraddrhint"
-                android:inputType="textUri" />
+                android:inputType="textUri"
+                android:text="@string/defaultserver" />
         </LinearLayout>
 
         <LinearLayout
@@ -46,7 +47,8 @@
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/serverporthint"
-                android:inputType="numberDecimal" />
+                android:inputType="number"
+                android:text="@string/defaultport" />
         </LinearLayout>
 
         <CheckBox

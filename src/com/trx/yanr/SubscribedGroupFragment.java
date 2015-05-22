@@ -134,12 +134,7 @@ public class SubscribedGroupFragment extends Fragment {
             break;
 
         case R.id.action_refresh:
-            cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
-            Cursor newCursor = cursor;
-            subdGrpAdptr.changeCursor (newCursor); // automatically closes old
-                                                   // Cursor
-            subdGrpAdptr.mCursor = newCursor;
-            subdGrpAdptr.notifyDataSetChanged ();
+            refreshGroups ();
             break;
 
         case R.id.action_settings:
@@ -161,6 +156,7 @@ public class SubscribedGroupFragment extends Fragment {
 
                             DBHelper dbHelper = new DBHelper (context);
                             dbHelper.onRebuild ();
+                            refreshGroups ();
 
                             dialog.cancel ();
                         }
@@ -183,15 +179,20 @@ public class SubscribedGroupFragment extends Fragment {
         return super.onOptionsItemSelected (item);
     }
 
-    @Override
-    public void onResume () {
-        sbscrbdGrpDbOper.open ();
+    private void refreshGroups () {
         cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
         Cursor newCursor = cursor;
         subdGrpAdptr.changeCursor (newCursor); // automatically closes old
                                                // Cursor
         subdGrpAdptr.mCursor = newCursor;
         subdGrpAdptr.notifyDataSetChanged ();
+        
+    }
+
+    @Override
+    public void onResume () {
+        sbscrbdGrpDbOper.open ();
+        refreshGroups ();
         super.onResume ();
     }
 

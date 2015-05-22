@@ -98,7 +98,7 @@ public class ServerDbOperator {
         }
     }
 
-    private void deleteRecord (Long _id) {
+    public void deleteRecord (Long _id) {
         try {
             // long id = record.getId();
             Log.i ("Record deleted with id: ---> ", String.valueOf (_id));
@@ -118,5 +118,19 @@ public class ServerDbOperator {
             e.printStackTrace();
         }
         return deleteRow;
+    }
+    
+    public Cursor getAllServers () {
+        Cursor cursor = null;
+        try {
+            cursor = database.query (DBHelper.SERVER_TABLE, allColumns,
+                    null, null, null, null, null);
+            Log.i ("--->", String.valueOf (cursor.getCount ()));
+            cursor.moveToFirst ();
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+
+        return cursor;
     }
 }
