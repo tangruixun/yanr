@@ -48,11 +48,12 @@
     <string name="mynickhint">Input nick name</string>
     <string name="myemaildes">Email:</string>
     <string name="myemailhint">Input email</string>
-    <string name="myorgdes">Orgnization: </string>
+    <string name="myorgdes">Org (Optional): </string>
     <string name="myorghint">Input orgnization</string>
-    <string name="myfacedes">Face: </string>
+    <string name="myfacedes">Face (Optional): </string>
     <string name="myfacehint">Input Face string</string>  
-    <string name="myxfacedes">X-Face: </string>
+    <string name="myxfacedes">X-Face (Optional): </string>
     <string name="myxfacehint">Input X-Face string</string>
     <string name="sslcheckboxdes">SSL required</string>
+    <string name="action_save">Save</string>
 </resources>

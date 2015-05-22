@@ -159,9 +159,9 @@ public class SingleGroupViewActivity extends Activity {
 
             @Override
             public boolean handleMessage (Message msg) {
-                dismissProDialog ();
 
                 if (msg.what == MSG_RETRIEVE_HEADERS_COMPLETE) {
+                    dismissProDialog ();
 
                     cursor = headDbOptr.getAllRecordByGroup (grpName, svrName);
                     Cursor newCursor = cursor;
@@ -169,6 +169,8 @@ public class SingleGroupViewActivity extends Activity {
                     listItemAdapter.mCursor = newCursor;
                     listItemAdapter.notifyDataSetChanged ();
                 } else if (msg.what == MSG_RETRIEVE_BODYS_COMPLETE) {
+                    dismissProDialog ();
+
                     int articleNo = msg.arg1;
                     Intent newsIntent = new Intent ();
                     newsIntent.setClass (context, NewsViewActivity.class);
@@ -179,6 +181,7 @@ public class SingleGroupViewActivity extends Activity {
                     startActivity (newsIntent);
                 } else if (msg.what == MSG_RETRIEVE_HEADERS_INCOMPLETE) {
                     // some error happened
+                    dismissProDialog ();
 
                 } else if (msg.what == MSG_RETRIEVE_HEADERS_PROGRESS) {
                     // progress bar animation
@@ -361,7 +364,9 @@ public class SingleGroupViewActivity extends Activity {
             process = 7;
         }
         pDialog.setProgress(process);
-        pDialog.show ();
+        if (!pDialog.isShowing ()) {
+            pDialog.show ();   
+        }
     }
 
     private void dismissProDialog () {

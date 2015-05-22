@@ -90,14 +90,9 @@ public class NntpOpHelper {
 //        return headerText;
 //    }
     
-    public int retrieveNewHeaders (HeaderDbOperator headerDbOptr, 
-            String servername, 
-            int port, 
-            String 
-            groupname, 
-            int lastArticleNoinDb,
-            Handler handler) 
-            throws IOException, Exception {
+    public int retrieveNewHeaders (HeaderDbOperator headerDbOptr,
+            String servername, int port, String groupname,
+            int lastArticleNoinDb, Handler handler) throws IOException, Exception {
         int r = -1;
         try {
             Socket nntpSocket = nntpclient.connect (servername, port);

@@ -5,7 +5,9 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp" >
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -14,12 +16,14 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/serveraddrdes" />
 
             <EditText
                 android:id="@+id/serveraddr"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/serveraddrhint"
                 android:inputType="textUri" />
@@ -32,16 +36,24 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/serverportdes" />
 
             <EditText
                 android:id="@+id/serverport"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/serverporthint"
                 android:inputType="numberDecimal" />
         </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/sslcheckbox"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sslcheckboxdes" />
 
         <View
             android:layout_width="fill_parent"
@@ -61,14 +73,17 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/serverusernamedes" />
 
             <EditText
                 android:id="@+id/serverusername"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
-                android:hint="@string/serverusernamehint" />
+                android:hint="@string/serverusernamehint"
+                android:enabled="false" />
         </LinearLayout>
 
         <LinearLayout
@@ -78,15 +93,18 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/serverpwddes" />
 
             <EditText
                 android:id="@+id/serverpwd"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/serverpwdhint"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:enabled="false" />
         </LinearLayout>
 
         <View
@@ -101,12 +119,14 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/mynickdes" />
 
             <EditText
                 android:id="@+id/mynick"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/mynickhint" />
         </LinearLayout>
@@ -118,12 +138,14 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/myemaildes" />
 
             <EditText
                 android:id="@+id/myemail"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/myemailhint"
                 android:inputType="textEmailAddress" />
@@ -136,12 +158,14 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/myorgdes" />
 
             <EditText
                 android:id="@+id/myorg"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/myorghint" />
         </LinearLayout>
@@ -153,12 +177,14 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/myfacedes" />
 
             <EditText
                 android:id="@+id/myface"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/myfacehint" />
         </LinearLayout>
@@ -170,12 +196,14 @@
 
             <TextView
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/myxfacedes" />
 
             <EditText
                 android:id="@+id/myxface"
                 android:layout_height="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="2"
                 android:hint="@string/myxfacehint" />
         </LinearLayout>
@@ -185,11 +213,12 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray" />
 
-        <CheckBox
-            android:id="@+id/sslcheckbox"
-            android:layout_width="fill_parent"
+        <Button
+            android:id="@+id/savebutton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/sslcheckboxdes" />
+            android:layout_gravity="center_horizontal"
+            android:text="@string/action_save" />
     </LinearLayout>
 
 </ScrollView>

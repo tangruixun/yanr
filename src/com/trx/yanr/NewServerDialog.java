@@ -5,7 +5,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 
 public final class NewServerDialog extends Dialog implements OnClickListener {
@@ -13,6 +16,7 @@ public final class NewServerDialog extends Dialog implements OnClickListener {
     Context context;
     EditText svrAddrV, svrPortV, svrUsranemV, svrPwdV, nickNameV, emailV, orgV, faceV, xfaceV;
     CheckBox loginReqV, sslReqV;
+    Button btnV;
 
     public NewServerDialog (Context _context) {
         super (_context);
@@ -35,7 +39,27 @@ public final class NewServerDialog extends Dialog implements OnClickListener {
         xfaceV = (EditText) findViewById (R.id.myxface);
         loginReqV = (CheckBox) findViewById (R.id.logincheckbox);
         sslReqV = (CheckBox) findViewById (R.id.sslcheckbox);
+        btnV = (Button) findViewById (R.id.savebutton);
+        
+        loginReqV.setOnCheckedChangeListener (new OnCheckedChangeListener() {
+            
+            @Override
+            public void onCheckedChanged (CompoundButton buttonView, boolean isChecked) {
+                int c = (isChecked == true) ? 1 : 0;
+                switch (c) {
+                case 1:
+                    svrUsranemV.setEnabled (true);
+                    svrPwdV.setEnabled (true);
+                    break;
 
+                default:
+                    svrUsranemV.setEnabled (false);
+                    svrPwdV.setEnabled (false);
+                    break;
+                }
+            }
+        });
+        
         
     }
 

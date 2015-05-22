@@ -43,6 +43,7 @@ public class ServerSettingsFragment extends PreferenceFragment {
 
     private void showAddServerDlg () {
         NewServerDialog newSvrDlg = new NewServerDialog (getActivity());
+        newSvrDlg.show ();
     }
     
     
