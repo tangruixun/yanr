@@ -150,13 +150,13 @@ public class AllGroupListActivity extends Activity {
     public class GetAllGroupsRunnable implements Runnable {
         
         private Handler handler;
-        private NntpOpHelper nntpOpHelper;
+        private NntpOpHelper nntpOpHelper = new NntpOpHelper ();
+;
 
         public GetAllGroupsRunnable (Handler mUI_handler) {
             super ();
             this.handler = mUI_handler; // UI handler
-            nntpOpHelper = new NntpOpHelper ();
-
+            //nntpOpHelper 
         }
 
         @Override

@@ -127,4 +127,20 @@ public class MainActivity extends FragmentActivity implements
         }  
         return true;  
     }
+
+    @Override
+    protected void onPause () {
+        super.onPause ();
+        // TODO: remember selected server and port  
+
+    }
+
+    @Override
+    protected void onResume () {
+        super.onResume ();
+        // TODO: restore selected server and port  
+
+    }
+    
+    
 }

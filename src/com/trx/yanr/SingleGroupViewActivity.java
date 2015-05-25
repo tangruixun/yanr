@@ -291,13 +291,13 @@ public class SingleGroupViewActivity extends Activity {
     public class GetBodyRunnable implements Runnable {
         private Handler handler;
         private int articleNo;
-        private NntpOpHelper nntpOpHelper;
+        private NntpOpHelper nntpOpHelper = new NntpOpHelper ();;
 
         public GetBodyRunnable (int articleNumber) {
             super ();
             this.handler = mUI_handler; // UI handler
             articleNo = articleNumber;
-            nntpOpHelper = new NntpOpHelper ();
+            //nntpOpHelper
         }
 
         @Override

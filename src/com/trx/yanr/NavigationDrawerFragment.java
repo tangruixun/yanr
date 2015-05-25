@@ -3,8 +3,10 @@ package com.trx.yanr;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -66,6 +68,11 @@ public class NavigationDrawerFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    
+    private ServerDbOperator svrDbOptr;
+    private Context context;
+    private Cursor c = null;
+    private ServerSettingAdapter adapter;
 
     public NavigationDrawerFragment () {
     }
@@ -92,6 +99,11 @@ public class NavigationDrawerFragment extends Fragment {
 
         // Select either the default item (0) or the last selected item.
         selectItem (mCurrentSelectedPosition);
+        
+        context = getActivity ();
+        svrDbOptr = new ServerDbOperator (context);
+        svrDbOptr.open ();
+        c = svrDbOptr.getAllServers ();
     }
 
     @Override
@@ -113,22 +125,46 @@ public class NavigationDrawerFragment extends Fragment {
                     public void onItemClick (AdapterView <?> parent, View view,
                             int position, long id) {
                         selectItem (position);
+                        
+                        c.moveToPosition (position);
+                        String serverAddr = c.getString (c.getColumnIndex (DBHelper.S_SRV_ADDR));
+                        String serverPort = c.getString (c.getColumnIndex (DBHelper.S_SRV_PORT));
+                        int port = Integer.parseInt (serverPort);
+                        
+                        getFragmentManager ().beginTransaction ()
+                            .replace (R.id.container, SubscribedGroupFragment.newInstance (serverAddr, port))
+                            .commit ();
                     }
                 });
-        mDrawerListView.setAdapter (new ArrayAdapter <String> (getActionBar ()
-                .getThemedContext (),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1, new String [] {
-                        getString (R.string.title_section1),
-                        getString (R.string.title_section2),
-                        getString (R.string.title_section3), }));
+        
+//        mDrawerListView.setAdapter (new ArrayAdapter <String> (getActionBar ()
+//                .getThemedContext (),
+//                android.R.layout.simple_list_item_activated_1,
+//                android.R.id.text1, new String [] {
+//                        getString (R.string.title_section1),
+//                        getString (R.string.title_section2),
+//                        getString (R.string.title_section3), }));
+        
+        adapter = new ServerSettingAdapter (context, c, 
+                ServerSettingAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        mDrawerListView.setAdapter (adapter);
+        
         mDrawerListView.setItemChecked (mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
 
     public boolean isDrawerOpen () {
+
         return mDrawerLayout != null
                 && mDrawerLayout.isDrawerOpen (mFragmentContainerView);
+    }
+
+    private void refresh () {
+        c = svrDbOptr.getAllServers ();
+        Cursor newC = c;
+        adapter.changeCursor (newC); // automatically closes old Cursor
+        adapter.mCursor = newC;
+        adapter.notifyDataSetChanged ();     
     }
 
     /**
@@ -185,6 +221,8 @@ public class NavigationDrawerFragment extends Fragment {
             @Override
             public void onDrawerOpened (View drawerView) {
                 super.onDrawerOpened (drawerView);
+                refresh ();
+
                 if (!isAdded ()) {
                     return;
                 }
@@ -198,6 +236,7 @@ public class NavigationDrawerFragment extends Fragment {
                             .getDefaultSharedPreferences (getActivity ());
                     sp.edit ().putBoolean (PREF_USER_LEARNED_DRAWER, true)
                             .apply ();
+                    
                 }
 
                 getActivity ().invalidateOptionsMenu (); // calls

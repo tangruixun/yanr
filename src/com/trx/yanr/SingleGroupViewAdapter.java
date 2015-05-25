@@ -2,8 +2,6 @@ package com.trx.yanr;
 
 import javax.mail.MessagingException;
 
-import com.trx.yanr.SubscribeGroupCursorListAdapter.TagView;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -67,5 +65,4 @@ public class SingleGroupViewAdapter extends CursorAdapter {
         TextView authorView;
         TextView dateView;
     }
-
 }
