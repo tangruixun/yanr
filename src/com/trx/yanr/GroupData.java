@@ -9,6 +9,7 @@ public class GroupData {
     private int latestArticleNumber;
     private Boolean postable; // y
     private String groupDes;
+    private Boolean subscribed;
     private String memo;
     public String getGroupName () {
         return groupName;
@@ -51,6 +52,12 @@ public class GroupData {
     }
     public void setGroupDes (String groupDes) {
         this.groupDes = groupDes;
+    }
+    public Boolean getSubscribed () {
+        return subscribed;
+    }
+    public void setSubscribed (Boolean subscribed) {
+        this.subscribed = subscribed;
     }
     public String getMemo () {
         return memo;

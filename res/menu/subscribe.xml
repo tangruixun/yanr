@@ -1,10 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.trx.yanr.SubscribeActivity" >
-
+    <item
+        android:id="@+id/action_refetch"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_refresh"
+        android:title="@string/action_refetch"/>
     <item
         android:id="@+id/action_subscribe"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_subscribe_done"
         android:title="@string/action_subscribe"/>

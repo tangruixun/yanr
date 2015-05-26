@@ -20,6 +20,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public final static String S_SG_LATESTARTICLENO = "s_LatestArticleNumber";
     public final static String S_SG_POSTABLE = "s_Postable";
     public final static String S_SG_GRPDES = "s_GrpDescription";
+    public final static String S_SG_SUBED = "s_Subed";
     public final static String S_SG_MEMO = "s_Memo";
     
     public final static String HEADER_TABLE = "Headers";
@@ -101,6 +102,7 @@ public class DBHelper extends SQLiteOpenHelper {
             + S_SG_LATESTARTICLENO + " INT, "
             + S_SG_POSTABLE + " INT, "
             + S_SG_GRPDES + " NVARCHAR(512), "
+            + S_SG_SUBED + " BOOLEAN DEFAULT 0, "
             + S_SG_MEMO + " NVARCHAR(512)"
             + ")";
 
@@ -145,7 +147,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL ("DROP TABLE IF EXISTS " + SUBSCRIBED_GROUPS_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + HEADER_TABLE);
         db.execSQL ("DROP TABLE IF EXISTS " + BODY_TABLE);
-
         
         onCreate (db);
     }

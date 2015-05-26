@@ -16,8 +16,9 @@ public class SubscribedGroupsDbOperator {
     public String [] allColumns = {
             DBHelper.S_SG_ID, DBHelper.S_SG_GRPNAME, 
             DBHelper.S_SG_SVRNAME, DBHelper.S_SG_READNO, 
-            DBHelper.S_SG_ARTICLENO, DBHelper.S_SG_LATESTARTICLENO, DBHelper.S_SG_POSTABLE, 
-            DBHelper.S_SG_GRPDES, DBHelper.S_SG_MEMO };
+            DBHelper.S_SG_ARTICLENO, DBHelper.S_SG_LATESTARTICLENO, 
+            DBHelper.S_SG_POSTABLE, DBHelper.S_SG_GRPDES, 
+            DBHelper.S_SG_SUBED, DBHelper.S_SG_MEMO };
     
     public SubscribedGroupsDbOperator (Context context) {
         super ();
@@ -40,8 +41,9 @@ public class SubscribedGroupsDbOperator {
         int nLatestArticleNo = grpData.getLatestArticleNumber ();
         Boolean bPostable = grpData.getPostable ();
         String strGrpDes = grpData.getGroupDes ();
+        Boolean bSubed = grpData.getSubscribed ();
         String strGrpMemo = grpData.getMemo ();
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, strGrpDes, strGrpMemo);
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, strGrpDes, bSubed, strGrpMemo);
     }
     
     public Cursor createRecord (String strGrpName, String strSrvName) {
@@ -55,16 +57,19 @@ public class SubscribedGroupsDbOperator {
     
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
             int nArticleNo, int nLatestArticleNo, Boolean bPostable) {
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, "");
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, "", false);
     }
     
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
-            int nArticleNo, int nLatestArticleNo, Boolean bPostable, String strGrpDes) {
-        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, nLatestArticleNo, bPostable, strGrpDes, "");
+            int nArticleNo, int nLatestArticleNo, Boolean bPostable, String strGrpDes, 
+            Boolean bSubed) {
+        return createRecord (strGrpName, strSrvName, nReadNo, nArticleNo, 
+                nLatestArticleNo, bPostable, strGrpDes, bSubed, "");
     }
 
     public Cursor createRecord (String strGrpName, String strSrvName, int nReadNo,
-            int nArticleNo, int nLatestArticleNo, Boolean bPostable, String strGrpDes, String strGrpMemo) {
+            int nArticleNo, int nLatestArticleNo, Boolean bPostable, String strGrpDes, 
+            Boolean bSubed, String strGrpMemo) {
         ContentValues contentValues = new ContentValues ();
         contentValues.put (DBHelper.S_SG_GRPNAME, strGrpName);
         contentValues.put (DBHelper.S_SG_SVRNAME, strSrvName);
@@ -72,6 +77,8 @@ public class SubscribedGroupsDbOperator {
         contentValues.put (DBHelper.S_SG_ARTICLENO, nArticleNo);
         contentValues.put (DBHelper.S_SG_LATESTARTICLENO, nLatestArticleNo);        
         contentValues.put (DBHelper.S_SG_POSTABLE, bPostable);
+        contentValues.put (DBHelper.S_SG_GRPDES, strGrpDes);
+        contentValues.put (DBHelper.S_SG_SUBED, bSubed);
         contentValues.put (DBHelper.S_SG_MEMO, strGrpMemo);
         
         long insertId = database.insert (DBHelper.SUBSCRIBED_GROUPS_TABLE, null, contentValues);
@@ -97,6 +104,65 @@ public class SubscribedGroupsDbOperator {
             e.printStackTrace ();
         }
         return cursor;
+    }
+    
+    public Cursor getSubscribeGroupsByServer (String serverName) {
+        Cursor cursor = null;
+        try {
+            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
+                    DBHelper.S_SG_SVRNAME + " = '" + serverName + "' AND "
+                    + DBHelper.S_SG_SUBED + " = 1 ", null, null, null, null);
+            cursor.moveToFirst ();
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+        return cursor;
+    }
+    
+    private void Unsubscribe (String grpName, String serverName) {
+        Cursor cursor = null;
+        int i = 0;
+        
+        try {
+            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns,
+                    DBHelper.S_SG_GRPNAME + " = '" + grpName
+                    + "' AND " + DBHelper.S_SG_SVRNAME + " = '" + serverName + "'",
+                    null, null, null, null);
+            
+            if (cursor != null) {
+                cursor.moveToFirst ();
+                int strId = cursor.getInt (cursor.getColumnIndex (DBHelper.S_SG_ID));
+                ContentValues conValues = new ContentValues ();
+                conValues.put (DBHelper.S_SG_SUBED, 0);
+                i = database.update (DBHelper.SUBSCRIBED_GROUPS_TABLE, 
+                        conValues, DBHelper.S_SG_ID + "=" + strId, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+    }
+
+    private void Subscribe (String grpName, String serverName) {
+        Cursor cursor = null;
+        int i = 0;
+        
+        try {
+            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns,
+                    DBHelper.S_SG_GRPNAME + " = '" + grpName
+                    + "' AND " + DBHelper.S_SG_SVRNAME + " = '" + serverName + "'",
+                    null, null, null, null);
+            
+            if (cursor != null) {
+                cursor.moveToFirst ();
+                int strId = cursor.getInt (cursor.getColumnIndex (DBHelper.S_SG_ID));
+                ContentValues conValues = new ContentValues ();
+                conValues.put (DBHelper.S_SG_SUBED, 1);
+                i = database.update (DBHelper.SUBSCRIBED_GROUPS_TABLE, 
+                        conValues, DBHelper.S_SG_ID + "=" + strId, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
     }
     
     private void deleteRecord (String grpName, String serverName) {
@@ -152,7 +218,7 @@ public class SubscribedGroupsDbOperator {
         ArrayList <String> grpNeedUnsubscribed = new ArrayList <String> ();
         Cursor cursor = null;
         try {            
-            cursor = getGroupsByServer (serverName); 
+            cursor = getSubscribeGroupsByServer (serverName); // group already subscribed
             cursor.moveToFirst ();
             if (cursor.getCount () > 0) {
                 do {
@@ -161,16 +227,16 @@ public class SubscribedGroupsDbOperator {
                         // newAddedGroup = all new subscribed groups - remove groups already subscribed
                         newAddedGrpList.remove (subedGrpName); 
                     } else {
-                        // add old groups not in the new subscribed group list to the list that groups needed to be removed.
+                        // add old groups not in the new subscribed group list to the list that groups needed to be unsubscribed.
                         grpNeedUnsubscribed.add (subedGrpName); 
                     }
                 } while (cursor.moveToNext ());
                 
                 for (String grpName : grpNeedUnsubscribed) {
-                    deleteRecord (grpName, serverName); // unsubscribe groups in db
+                    Unsubscribe (grpName, serverName); // unsubscribe groups in db
                 }
                 for (String grpName : newAddedGrpList) {
-                    createRecord (grpName, serverName); // subscribe new groups in db
+                    Subscribe (grpName, serverName); // subscribe new groups in db
                 }
                 return 0;
             } else if (cursor.getCount () == 0) {

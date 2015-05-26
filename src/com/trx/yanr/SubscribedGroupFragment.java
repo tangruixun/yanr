@@ -84,7 +84,7 @@ public class SubscribedGroupFragment extends Fragment {
 
         try {
             sbscrbdGrpDbOper.open ();
-            cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
+            cursor = sbscrbdGrpDbOper.getSubscribeGroupsByServer (serverName);
 
             subdGrpAdptr = new SubscribeGroupCursorListAdapter (
                     getActivity (),

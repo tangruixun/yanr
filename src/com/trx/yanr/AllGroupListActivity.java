@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -36,12 +37,17 @@ public class AllGroupListActivity extends Activity {
     private String servername;
     private int port;
     
+    SubscribedGroupsDbOperator sgDbOpr;
+    Cursor c = null;
+    
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         
         context = this;
         pDialog = new ProgressDialog (context);
+        sgDbOpr = new SubscribedGroupsDbOperator (context);
+        sgDbOpr.open ();
         
         bundle = getIntent ().getExtras ();
         servername = bundle.getString ("ServerName");
@@ -51,6 +57,33 @@ public class AllGroupListActivity extends Activity {
         selectionArray = new SparseBooleanArray ();
         
         setContentView (R.layout.layout_subscribe);
+        
+        c = sgDbOpr.getSubscribeGroupsByServer (servername);
+        ListView lv = (ListView) findViewById (R.id.listview);
+        final AllGroupCListAdapter grpAptr = new AllGroupCListAdapter (context, 
+                c, 
+                AllGroupCListAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        lv.setAdapter (grpAptr);
+        lv.setOnItemClickListener (new OnItemClickListener() {
+
+            @Override
+            public void onItemClick (AdapterView <?> parent,
+                    View view, int position, long id) {
+                CheckBox ckbView = (CheckBox) view.findViewById (R.id.checkbox); // get checkbox view
+                if (grpAdptr.isChecked (position)) {
+                    grpAdptr.setSelectionArray (position, false);
+                    ckbView.setChecked (false);
+                } else {
+                    grpAdptr.setSelectionArray (position, true);
+                    ckbView.setChecked (true);
+                }
+                
+                selectionArray = grpAdptr.getSelectionArray();
+                
+            }
+        });
+        
+        
         mUI_handler = new Handler () {
 
             @Override
@@ -58,28 +91,10 @@ public class AllGroupListActivity extends Activity {
                 super.handleMessage (msg);
                 if (msg.what == MSG_ALL_GROUPS_RETRIEVED) {
                     if (allnewsgroups != null) {
-                        ListView lv = (ListView) findViewById (R.id.listview);
-                        final AllGroupListAdapter grpAdptr = new AllGroupListAdapter (context, allnewsgroups);
-                        lv.setAdapter (grpAdptr);
                         
-                        lv.setOnItemClickListener (new OnItemClickListener() {
 
-                            @Override
-                            public void onItemClick (AdapterView <?> parent,
-                                    View view, int position, long id) {
-                                CheckBox ckbView = (CheckBox) view.findViewById (R.id.checkbox); // get checkbox view
-                                if (grpAdptr.isChecked (position)) {
-                                    grpAdptr.setSelectionArray (position, false);
-                                    ckbView.setChecked (false);
-                                } else {
-                                    grpAdptr.setSelectionArray (position, true);
-                                    ckbView.setChecked (true);
-                                }
-                                
-                                selectionArray = grpAdptr.getSelectionArray();
-                                
-                            }
-                        });
+                        
+
                     }
 //                    cursor = tasksDbOperator.getAllRecords ();
 //                    Cursor newCursor = cursor;
@@ -92,12 +107,7 @@ public class AllGroupListActivity extends Activity {
             }            
         };
         
-        showProDialog (0, 100);
-        mGetAllGroups_thread = new HandlerThread ("GetAllGroups");
-        mGetAllGroups_thread.start ();
-        mGetAllGroups_handler = new Handler (mGetAllGroups_thread.getLooper ());
-        myGetAllGroupsRunnable = new GetAllGroupsRunnable (mUI_handler);
-        mGetAllGroups_handler.post (myGetAllGroupsRunnable);
+
     }
 
     @Override
@@ -125,9 +135,17 @@ public class AllGroupListActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId ();
-        if (id == R.id.action_subscribe) {
-            SubscribedGroupsDbOperator sgDbOpr = new SubscribedGroupsDbOperator (context);
-            sgDbOpr.open ();
+        if (id == R.id.action_refetch) {
+            // refetch group list
+            showProDialog (0, 100);
+            mGetAllGroups_thread = new HandlerThread ("GetAllGroups");
+            mGetAllGroups_thread.start ();
+            mGetAllGroups_handler = new Handler (mGetAllGroups_thread.getLooper ());
+            myGetAllGroupsRunnable = new GetAllGroupsRunnable (mUI_handler);
+            mGetAllGroups_handler.post (myGetAllGroupsRunnable);
+            
+            return true;
+        } else if (id == R.id.action_subscribe) {
             ArrayList <String> subdGrpList = new ArrayList <String> ();
             String grpName;
             for (int i=0; i<allnewsgroups.size (); i++) {

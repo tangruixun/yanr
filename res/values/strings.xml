@@ -16,6 +16,7 @@
     <string name="action_groupsubscribe">Subscribe Group</string>
     <string name="title_activity_subscribe">All Groups</string>
     <string name="action_subscribe">Subscribe</string>
+    <string name="action_refetch">Refetch Group List</string>
     <string name="db_path">/data/data/com.trx.yanr/databases/</string>
     <string name="title_activity_single_group_view">SingleGroupViewActivity</string>
     <string name="action_retrieve_articles">Retrieve New News</string>
