@@ -29,7 +29,7 @@ import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAni
 public class SubscribedGroupFragment extends Fragment {
     private ListView lv;
     private SubscribeGroupCursorListAdapter subdGrpAdptr;
-    private SubscribedGroupsDbOperator sbscrbdGrpDbOper;
+    private AllGroupsDbOperator sbscrbdGrpDbOper;
     private String serverName;
     private int port;
     private Context context;
@@ -63,7 +63,7 @@ public class SubscribedGroupFragment extends Fragment {
             serverName = getArguments ().getString ("ServerName");
             port = getArguments ().getInt ("Port");
         }
-        sbscrbdGrpDbOper = new SubscribedGroupsDbOperator (getActivity ());
+        sbscrbdGrpDbOper = new AllGroupsDbOperator (getActivity ());
     }
 
     @Override
@@ -180,7 +180,7 @@ public class SubscribedGroupFragment extends Fragment {
     }
 
     private void refreshGroups () {
-        cursor = sbscrbdGrpDbOper.getGroupsByServer (serverName);
+        cursor = sbscrbdGrpDbOper.getCursorByServer (serverName);
         Cursor newCursor = cursor;
         subdGrpAdptr.changeCursor (newCursor); // automatically closes old
                                                // Cursor

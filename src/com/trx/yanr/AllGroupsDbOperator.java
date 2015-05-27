@@ -9,7 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-public class SubscribedGroupsDbOperator {
+public class AllGroupsDbOperator {
     
     private SQLiteDatabase database;
     private DBHelper subscribedGroupDbHelper;
@@ -20,7 +20,7 @@ public class SubscribedGroupsDbOperator {
             DBHelper.S_SG_POSTABLE, DBHelper.S_SG_GRPDES, 
             DBHelper.S_SG_SUBED, DBHelper.S_SG_MEMO };
     
-    public SubscribedGroupsDbOperator (Context context) {
+    public AllGroupsDbOperator (Context context) {
         super ();
         subscribedGroupDbHelper = new DBHelper (context);
     }
@@ -94,11 +94,11 @@ public class SubscribedGroupsDbOperator {
         return cursor;
     }
     
-    public Cursor getGroupsByServer (String serverName) {
+    public Cursor getCursorByServer (String serverAddr) {
         Cursor cursor = null;
         try {
             cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
-                    DBHelper.S_SG_SVRNAME + " = '" + serverName + "'", null, null, null, null);
+                    DBHelper.S_SG_SVRNAME + " = '" + serverAddr + "'", null, null, null, null);
             cursor.moveToFirst ();
         } catch (Exception e) {
             e.printStackTrace ();
@@ -106,11 +106,24 @@ public class SubscribedGroupsDbOperator {
         return cursor;
     }
     
-    public Cursor getSubscribeGroupsByServer (String serverName) {
+    public Cursor getCursorByGroupAndServer (String group, String serverAddr) {
+        Cursor cursor = null;
+        try {
+            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns,
+                    DBHelper.S_SG_GRPNAME + " = '" + group
+                    + "' AND " + DBHelper.S_SG_SVRNAME + " = '" + serverAddr + "'",
+                    null, null, null, null);
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+        return cursor;
+    }
+    
+    public Cursor getSubscribeGroupsByServer (String serverAddr) {
         Cursor cursor = null;
         try {
             cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
-                    DBHelper.S_SG_SVRNAME + " = '" + serverName + "' AND "
+                    DBHelper.S_SG_SVRNAME + " = '" + serverAddr + "' AND "
                     + DBHelper.S_SG_SUBED + " = 1 ", null, null, null, null);
             cursor.moveToFirst ();
         } catch (Exception e) {
@@ -119,15 +132,12 @@ public class SubscribedGroupsDbOperator {
         return cursor;
     }
     
-    private void Unsubscribe (String grpName, String serverName) {
+    private int Unsubscribe (String group, String serverAddr) {
         Cursor cursor = null;
         int i = 0;
         
         try {
-            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns,
-                    DBHelper.S_SG_GRPNAME + " = '" + grpName
-                    + "' AND " + DBHelper.S_SG_SVRNAME + " = '" + serverName + "'",
-                    null, null, null, null);
+            cursor = getCursorByGroupAndServer (group, serverAddr);
             
             if (cursor != null) {
                 cursor.moveToFirst ();
@@ -140,17 +150,16 @@ public class SubscribedGroupsDbOperator {
         } catch (Exception e) {
             e.printStackTrace ();
         }
+        
+        return i;
     }
 
-    private void Subscribe (String grpName, String serverName) {
+    private int Subscribe (String group, String serverAddr) {
         Cursor cursor = null;
         int i = 0;
         
         try {
-            cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns,
-                    DBHelper.S_SG_GRPNAME + " = '" + grpName
-                    + "' AND " + DBHelper.S_SG_SVRNAME + " = '" + serverName + "'",
-                    null, null, null, null);
+            cursor = getCursorByGroupAndServer (group, serverAddr);
             
             if (cursor != null) {
                 cursor.moveToFirst ();
@@ -163,13 +172,38 @@ public class SubscribedGroupsDbOperator {
         } catch (Exception e) {
             e.printStackTrace ();
         }
+        return i;
     }
     
-    private void deleteRecord (String grpName, String serverName) {
+    public Boolean isGroupNameInDb (String group, String serverAddr) {
+        Cursor c = null;
+        Boolean result = false;
         try {
-            Cursor c = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
-                    DBHelper.S_SG_SVRNAME + " = '" + serverName + "' AND " + DBHelper.S_SG_GRPNAME + " = '" + grpName + "'", 
-                    null, null, null, null);
+            c = getCursorByGroupAndServer (group, serverAddr);
+            if (c != null) {
+                if (c.moveToFirst () && c.getCount () > 0) {
+                    result = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+        return result;
+    }
+    
+    public void deleteRecord (String group, String serverAddr) {
+        try {
+            Cursor c = getCursorByGroupAndServer (group, serverAddr);
+            c.moveToFirst ();
+            deleteRecord (c);
+        } catch (Exception e) {
+            e.printStackTrace ();
+        }
+    }
+    
+    public void deleteAllRecordsByServerName (String serverAddr) {
+        try {
+            Cursor c = getCursorByServer (serverAddr);
             c.moveToFirst ();
             deleteRecord (c);
         } catch (Exception e) {
@@ -212,6 +246,20 @@ public class SubscribedGroupsDbOperator {
         return deleteRow;
     }
 
+    public void addNewGroup (String group, String serverAddr) {
+        Cursor c = null;
+        try {
+            c = getCursorByGroupAndServer (group, serverAddr);
+            if (c != null) {
+                if (c.getCount () == 0) { // no this group record in db
+                    createRecord (group, serverAddr);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     // grpList: all new subscribed groups
     public int subscribeGroup (ArrayList <String> grpList, String serverName) {
         ArrayList <String> newAddedGrpList = grpList;
@@ -251,4 +299,5 @@ public class SubscribedGroupsDbOperator {
         }
         return 2;
     }
+
 }

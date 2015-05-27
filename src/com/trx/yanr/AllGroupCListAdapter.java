@@ -1,7 +1,5 @@
 package com.trx.yanr;
 
-import com.trx.yanr.ServerSettingAdapter.TagView;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
@@ -14,13 +12,11 @@ import android.widget.TextView;
 public class AllGroupCListAdapter extends CursorAdapter {
     
     public Cursor mCursor;
-    private Context mContext;
     private LayoutInflater adapterInflater;
     private TagView tag;
     
     public AllGroupCListAdapter (Context context, Cursor c, int flags) {
         super (context, c, flags);
-        mContext = context;
         mCursor = c;
         adapterInflater = LayoutInflater.from (context);
     }
@@ -54,6 +50,11 @@ public class AllGroupCListAdapter extends CursorAdapter {
         } else {
             tag.subedView.setChecked (true);
         }
+    }
+    
+    public boolean isChecked (int position) {
+        mCursor.moveToPosition (position);
+        return  (mCursor.getInt (mCursor.getColumnIndex (DBHelper.S_SG_SUBED)) > 0) ? true : false;
     }
     
     public final class TagView {
