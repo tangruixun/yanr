@@ -1,7 +1,10 @@
 package com.trx.yanr;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +17,15 @@ public class AllGroupCListAdapter extends CursorAdapter {
     public Cursor mCursor;
     private LayoutInflater adapterInflater;
     private TagView tag;
-    
+    private SparseBooleanArray selectionArray = new SparseBooleanArray ();
+
     public AllGroupCListAdapter (Context context, Cursor c, int flags) {
         super (context, c, flags);
         mCursor = c;
         adapterInflater = LayoutInflater.from (context);
+        for (int i = 0; i < this.getCount(); i++) {
+            selectionArray.put (i, false); // initializes all items value with false
+        }
     }
 
     @Override
@@ -39,24 +46,35 @@ public class AllGroupCListAdapter extends CursorAdapter {
         try {
             groupNameText = mCursor.getString (mCursor.getColumnIndex (DBHelper.S_SG_GRPNAME));
             bSubed = mCursor.getInt (mCursor.getColumnIndex (DBHelper.S_SG_SUBED));
-            
         } catch (Exception e) {
             e.printStackTrace ();
         }
         
         tag.groupNameView.setText (groupNameText);
-        if (bSubed == 0) {
-            tag.subedView.setChecked (false);
-        } else {
-            tag.subedView.setChecked (true);
-        }
+        tag.subedView.setChecked (selectionArray.get (cursor.getPosition ()));
     }
     
     public boolean isChecked (int position) {
-        mCursor.moveToPosition (position);
-        return  (mCursor.getInt (mCursor.getColumnIndex (DBHelper.S_SG_SUBED)) > 0) ? true : false;
+        if (selectionArray.get (position) == false) {
+            return false;
+        } else {
+            return true;
+        }
     }
     
+    public void setSelectionArray (int position, boolean checked) {
+        selectionArray.put(position, checked);
+    }
+    
+    public SparseBooleanArray getSelectionArray () {
+        return selectionArray;
+    }
+    
+    @Override
+    public int getCount () {
+        return mCursor.getCount ();
+    }
+
     public final class TagView {
         TextView groupNameView;
         CheckBox subedView;

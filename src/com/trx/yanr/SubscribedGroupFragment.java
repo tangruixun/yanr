@@ -84,7 +84,7 @@ public class SubscribedGroupFragment extends Fragment {
 
         try {
             sbscrbdGrpDbOper.open ();
-            cursor = sbscrbdGrpDbOper.getSubscribeGroupsByServer (serverName);
+            cursor = sbscrbdGrpDbOper.getSubscribeGroupsCursorByServer (serverName);
 
             subdGrpAdptr = new SubscribeGroupCursorListAdapter (
                     getActivity (),
@@ -180,7 +180,7 @@ public class SubscribedGroupFragment extends Fragment {
     }
 
     private void refreshGroups () {
-        cursor = sbscrbdGrpDbOper.getCursorByServer (serverName);
+        cursor = sbscrbdGrpDbOper.getGroupCursorByServer (serverName);
         Cursor newCursor = cursor;
         subdGrpAdptr.changeCursor (newCursor); // automatically closes old
                                                // Cursor

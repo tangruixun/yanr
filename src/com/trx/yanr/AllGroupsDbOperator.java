@@ -94,7 +94,7 @@ public class AllGroupsDbOperator {
         return cursor;
     }
     
-    public Cursor getCursorByServer (String serverAddr) {
+    public Cursor getGroupCursorByServer (String serverAddr) {
         Cursor cursor = null;
         try {
             cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
@@ -119,7 +119,7 @@ public class AllGroupsDbOperator {
         return cursor;
     }
     
-    public Cursor getSubscribeGroupsByServer (String serverAddr) {
+    public Cursor getSubscribeGroupsCursorByServer (String serverAddr) {
         Cursor cursor = null;
         try {
             cursor = database.query (DBHelper.SUBSCRIBED_GROUPS_TABLE, allColumns, 
@@ -203,7 +203,7 @@ public class AllGroupsDbOperator {
     
     public void deleteAllRecordsByServerName (String serverAddr) {
         try {
-            Cursor c = getCursorByServer (serverAddr);
+            Cursor c = getGroupCursorByServer (serverAddr);
             c.moveToFirst ();
             deleteRecord (c);
         } catch (Exception e) {
@@ -246,7 +246,7 @@ public class AllGroupsDbOperator {
         return deleteRow;
     }
 
-    public void addNewGroup (String group, String serverAddr) {
+    public void addOnlyNewGroup (String group, String serverAddr) {
         Cursor c = null;
         try {
             c = getCursorByGroupAndServer (group, serverAddr);
@@ -266,7 +266,7 @@ public class AllGroupsDbOperator {
         ArrayList <String> grpNeedUnsubscribed = new ArrayList <String> ();
         Cursor cursor = null;
         try {            
-            cursor = getSubscribeGroupsByServer (serverName); // group already subscribed
+            cursor = getSubscribeGroupsCursorByServer (serverName); // group already subscribed
             cursor.moveToFirst ();
             if (cursor.getCount () > 0) {
                 do {

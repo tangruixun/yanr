@@ -29,13 +29,13 @@ public class AllGroupListActivity extends Activity {
     private HandlerThread mGetAllGroups_thread;
     private GetAllGroupsRunnable myGetAllGroupsRunnable;
     private NewsGroups allnewsgroups;
-    private SparseBooleanArray selectionArray;
     private Context context; 
     private ProgressDialog pDialog;
     
     private Bundle bundle;
     private String servername;
     private int port;
+    private String serverAddr;
     
     private AllGroupsDbOperator sgDbOpr;
     private Cursor cursor = null;
@@ -53,13 +53,13 @@ public class AllGroupListActivity extends Activity {
         bundle = getIntent ().getExtras ();
         servername = bundle.getString ("ServerName");
         port = bundle.getInt ("Port");
+        serverAddr = servername + ":" + String.valueOf (port);
         
         allnewsgroups = new NewsGroups ();
-        selectionArray = new SparseBooleanArray ();
         
         setContentView (R.layout.layout_subscribe);
         
-        cursor = sgDbOpr.getSubscribeGroupsByServer (servername);
+        cursor = sgDbOpr.getSubscribeGroupsCursorByServer (servername);
         ListView lv = (ListView) findViewById (R.id.listview);
         grpAdptr = new AllGroupCListAdapter (context, 
                 cursor, 
@@ -71,15 +71,14 @@ public class AllGroupListActivity extends Activity {
             public void onItemClick (AdapterView <?> parent,
                     View view, int position, long id) {
                 CheckBox ckbView = (CheckBox) view.findViewById (R.id.checkbox); // get checkbox view
-//                TextView grpTxtView = (TextView) view.findViewById (R.id.GroupName);
-//                String strGrpText = grpTxtView.getText ().toString ();
+
                 if (grpAdptr.isChecked (position)) {
-                    selectionArray.delete (position);
+                    grpAdptr.setSelectionArray (position, false);;
                     ckbView.setChecked (false);
                 } else {
-                    selectionArray.append (position, true);
+                    grpAdptr.setSelectionArray (position, true);
                     ckbView.setChecked (true);
-                }                
+                }
             }
         });
         
@@ -99,7 +98,7 @@ public class AllGroupListActivity extends Activity {
     }
     
     private void refresh () {
-        cursor = sgDbOpr.getSubscribeGroupsByServer (servername);
+        cursor = sgDbOpr.getGroupCursorByServer (serverAddr);
         Cursor newCursor = cursor;
         grpAdptr.changeCursor (newCursor); // automatically closes old                                                            // Cursor
         grpAdptr.mCursor = newCursor;
@@ -145,16 +144,15 @@ public class AllGroupListActivity extends Activity {
         } else if (id == R.id.action_subscribe) {
             ArrayList <String> subdGrpList = new ArrayList <String> ();
             String grpName;
+            SparseBooleanArray sAy = grpAdptr.getSelectionArray ();
             for (int i=0; i<allnewsgroups.size (); i++) {
-                if (selectionArray.get (i) == true) {
+                if (sAy.get (i) == true) {
                     grpName = allnewsgroups.elementAt (i);
                     subdGrpList.add (grpName);
                 }
             }
             int subd_result = sgDbOpr.subscribeGroup (subdGrpList, servername);
 
-            
-            
             
             finish ();
             return true;
@@ -180,14 +178,12 @@ public class AllGroupListActivity extends Activity {
             try {
                 allnewsgroups = nntpOpHelper.retrieveAllGroups (servername, port); // all groupname from server
                 String serverAddr = servername + ":" + port;
-                Cursor allGroupInDbCursor = sgDbOpr.getCursorByServer (serverAddr); // all groupname from local database
+                Cursor allGroupInDbCursor = sgDbOpr.getGroupCursorByServer (serverAddr); // all groupname from local database
 
-                for (String group : allnewsgroups.groups) {
+                for (String group : allnewsgroups.groups) { // every group name from server
                     Log.i ("--->", group);
-                    sgDbOpr.addNewGroup (group, serverAddr);
-                    if () {
-                        
-                    }
+                    sgDbOpr.addOnlyNewGroup (group, serverAddr);
+
                     
                 }
             } catch (Exception e) {
