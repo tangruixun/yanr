@@ -32,6 +32,7 @@ public class NewsViewActivity extends Activity {
         context = this;
 
         String strSubject, strFrom, strNewsgroup, strDate, strBody;
+        String strContentType;
         NNTPMessageHeader header = new NNTPMessageHeader ();
         HeaderDbOperator headerDbOptr = new HeaderDbOperator (context);
         BodyDbOperator bodyDbOptr = new BodyDbOperator (context);
@@ -62,6 +63,7 @@ public class NewsViewActivity extends Activity {
             strFrom = header.getFrom ();
             strNewsgroup = grpName;
             strDate = header.getDate ();
+            strContentType = header.getContentType ();
         
             // body
             Cursor cBody = bodyDbOptr.getRecordByArticleId (grpName, svrName, articleNo);

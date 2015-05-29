@@ -45,6 +45,14 @@ public class SubscribedGroupFragment extends Fragment {
         f.setArguments (bdl);
         return f;
     }
+    
+    public static final SubscribedGroupFragment newInstance (Cursor c) {
+        String serverAddr = c.getString (c.getColumnIndex (DBHelper.S_SRV_ADDR));
+        String serverPort = c.getString (c.getColumnIndex (DBHelper.S_SRV_PORT));
+        int port = Integer.parseInt (serverPort);
+        
+        return newInstance (serverAddr, port);
+    }
 
     @Override
     public void onAttach (Activity activity) {

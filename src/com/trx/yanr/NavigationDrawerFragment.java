@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 /**
@@ -127,23 +126,12 @@ public class NavigationDrawerFragment extends Fragment {
                         selectItem (position);
                         
                         c.moveToPosition (position);
-                        String serverAddr = c.getString (c.getColumnIndex (DBHelper.S_SRV_ADDR));
-                        String serverPort = c.getString (c.getColumnIndex (DBHelper.S_SRV_PORT));
-                        int port = Integer.parseInt (serverPort);
                         
                         getFragmentManager ().beginTransaction ()
-                            .replace (R.id.container, SubscribedGroupFragment.newInstance (serverAddr, port))
+                            .replace (R.id.container, SubscribedGroupFragment.newInstance (c))
                             .commit ();
                     }
                 });
-        
-//        mDrawerListView.setAdapter (new ArrayAdapter <String> (getActionBar ()
-//                .getThemedContext (),
-//                android.R.layout.simple_list_item_activated_1,
-//                android.R.id.text1, new String [] {
-//                        getString (R.string.title_section1),
-//                        getString (R.string.title_section2),
-//                        getString (R.string.title_section3), }));
         
         adapter = new ServerSettingAdapter (context, c, 
                 ServerSettingAdapter.FLAG_REGISTER_CONTENT_OBSERVER);

@@ -16,6 +16,7 @@ public class NNTPMessageHeader {
 
 	private HashMap<String, String> headers = new HashMap<String, String>();
 	
+	// return nntpHeader from text string
     public static NNTPMessageHeader cvrtTxt (String headerText) throws MessagingException {
         NNTPMessageHeader nntpHeader = new NNTPMessageHeader ();
         InputStream stream = new ByteArrayInputStream(headerText.getBytes(StandardCharsets.UTF_8));
@@ -38,6 +39,10 @@ public class NNTPMessageHeader {
 	
     public String getDate () {
         return getHeader("Date");
+    }
+    
+    public String getContentType() {
+        return getHeader ("Content-Type");
     }
     
 	public String getHeader (String Key) {
