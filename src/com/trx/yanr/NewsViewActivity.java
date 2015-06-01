@@ -1,6 +1,12 @@
 package com.trx.yanr;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeUtility;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -69,6 +75,11 @@ public class NewsViewActivity extends Activity {
             Cursor cBody = bodyDbOptr.getRecordByArticleId (grpName, svrName, articleNo);
             strBody = cBody.getString (cBody.getColumnIndex (DBHelper.S_B_BODYTEXT));
             
+            strSubject = MimeUtility.decodeText (strSubject);
+            InputStream stream = new ByteArrayInputStream(strBody.getBytes(StandardCharsets.UTF_8));
+            InputStream is = MimeUtility.decode (stream, strContentType);
+
+            
             subjectView.setText (strSubject); 
             fromView.setText (strFrom); 
             newsgroupView.setText (strNewsgroup); 
@@ -81,6 +92,8 @@ public class NewsViewActivity extends Activity {
             actionBar.setDisplayHomeAsUpEnabled (true);
         } catch (MessagingException e) {
             e.printStackTrace ();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
     }
 

@@ -28,7 +28,8 @@ public class AllGroupListActivity extends Activity {
     private Handler mGetAllGroups_handler;
     private HandlerThread mGetAllGroups_thread;
     private GetAllGroupsRunnable myGetAllGroupsRunnable;
-    private NewsGroups allnewsgroups;
+    private NewsGroups allnewsgroupsfromserver;
+    private ArrayList <String> allnewsgroupsindb;
     private Context context; 
     private ProgressDialog pDialog;
     
@@ -55,11 +56,23 @@ public class AllGroupListActivity extends Activity {
         port = bundle.getInt ("Port");
         serverAddr = servername + ":" + String.valueOf (port);
         
-        allnewsgroups = new NewsGroups ();
+        allnewsgroupsindb = new ArrayList <String> ();
+        Cursor allGroupInDbCursor = sgDbOpr.getGroupCursorByServer (serverAddr); // all groupname from local database
+        if (allGroupInDbCursor != null) {
+            if (allGroupInDbCursor.getCount () != 0) {
+                allGroupInDbCursor.moveToFirst ();
+                do {
+                    String name = allGroupInDbCursor.getString (allGroupInDbCursor.getColumnIndex (DBHelper.S_SG_GRPNAME));
+                    allnewsgroupsindb.add (name);
+                } while (allGroupInDbCursor.moveToNext ());
+            }
+        }
+        allGroupInDbCursor.close ();
+        allGroupInDbCursor = null;
         
         setContentView (R.layout.layout_subscribe);
         
-        cursor = sgDbOpr.getSubscribeGroupsCursorByServer (servername);
+        cursor = sgDbOpr.getGroupCursorByServer (serverAddr);
         ListView lv = (ListView) findViewById (R.id.listview);
         grpAdptr = new AllGroupCListAdapter (context, 
                 cursor, 
@@ -89,7 +102,7 @@ public class AllGroupListActivity extends Activity {
             public void handleMessage (Message msg) {
                 super.handleMessage (msg);
                 if (msg.what == MSG_ALL_GROUPS_RETRIEVED) {
-                    if (allnewsgroups != null) {
+                    if (allnewsgroupsfromserver != null) {
                         refresh ();
                     }
                 }
@@ -145,13 +158,13 @@ public class AllGroupListActivity extends Activity {
             ArrayList <String> subdGrpList = new ArrayList <String> ();
             String grpName;
             SparseBooleanArray sAy = grpAdptr.getSelectionArray ();
-            for (int i=0; i<allnewsgroups.size (); i++) {
+            for (int i=0; i<allnewsgroupsindb.size (); i++) {
                 if (sAy.get (i) == true) {
-                    grpName = allnewsgroups.elementAt (i);
+                    grpName = allnewsgroupsindb.get (i);
                     subdGrpList.add (grpName);
                 }
             }
-            int subd_result = sgDbOpr.subscribeGroup (subdGrpList, servername);
+            int subd_result = sgDbOpr.subscribeGroup (subdGrpList, serverAddr);
 
             
             finish ();
@@ -164,7 +177,6 @@ public class AllGroupListActivity extends Activity {
         
         private Handler handler;
         private NntpOpHelper nntpOpHelper = new NntpOpHelper ();
-;
 
         public GetAllGroupsRunnable (Handler mUI_handler) {
             super ();
@@ -176,11 +188,10 @@ public class AllGroupListActivity extends Activity {
         public void run () {
             Message msg;
             try {
-                allnewsgroups = nntpOpHelper.retrieveAllGroups (servername, port); // all groupname from server
+                allnewsgroupsfromserver = nntpOpHelper.retrieveAllGroupsFromServer (servername, port); // all groupname from server
                 String serverAddr = servername + ":" + port;
-                Cursor allGroupInDbCursor = sgDbOpr.getGroupCursorByServer (serverAddr); // all groupname from local database
 
-                for (String group : allnewsgroups.groups) { // every group name from server
+                for (String group : allnewsgroupsfromserver.groups) { // every group name from server
                     Log.i ("--->", group);
                     sgDbOpr.addOnlyNewGroup (group, serverAddr);
 
@@ -189,7 +200,18 @@ public class AllGroupListActivity extends Activity {
             } catch (Exception e) {
                 e.printStackTrace ();
             }
-            
+            Cursor allGroupInDbCursor = sgDbOpr.getGroupCursorByServer (serverAddr); // all groupname from local database
+            if (allGroupInDbCursor != null) {
+                if (allGroupInDbCursor.getCount () != 0) {
+                    allGroupInDbCursor.moveToFirst ();
+                    do {
+                        String name = allGroupInDbCursor.getString (allGroupInDbCursor.getColumnIndex (DBHelper.S_SG_GRPNAME));
+                        allnewsgroupsindb.add (name);
+                    } while (allGroupInDbCursor.moveToNext ());
+                }
+            }
+            allGroupInDbCursor.close ();
+            allGroupInDbCursor = null;
             msg = this.handler.obtainMessage ();
             msg.what = MSG_ALL_GROUPS_RETRIEVED;
             this.handler.sendMessage (msg);

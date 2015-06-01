@@ -257,16 +257,18 @@ public class AllGroupsDbOperator {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            c.close ();
         }
     }
     
     // grpList: all new subscribed groups
-    public int subscribeGroup (ArrayList <String> grpList, String serverName) {
+    public int subscribeGroup (ArrayList <String> grpList, String serverAddr) {
         ArrayList <String> newAddedGrpList = grpList;
         ArrayList <String> grpNeedUnsubscribed = new ArrayList <String> ();
         Cursor cursor = null;
         try {            
-            cursor = getSubscribeGroupsCursorByServer (serverName); // group already subscribed
+            cursor = getSubscribeGroupsCursorByServer (serverAddr); // group already subscribed
             cursor.moveToFirst ();
             if (cursor.getCount () > 0) {
                 do {
@@ -281,15 +283,15 @@ public class AllGroupsDbOperator {
                 } while (cursor.moveToNext ());
                 
                 for (String grpName : grpNeedUnsubscribed) {
-                    Unsubscribe (grpName, serverName); // unsubscribe groups in db
+                    Unsubscribe (grpName, serverAddr); // unsubscribe groups in db
                 }
                 for (String grpName : newAddedGrpList) {
-                    Subscribe (grpName, serverName); // subscribe new groups in db
+                    Subscribe (grpName, serverAddr); // subscribe new groups in db
                 }
                 return 0;
             } else if (cursor.getCount () == 0) {
                 for (String grpName : newAddedGrpList) {
-                    createRecord (grpName, serverName); // subscribe new groups in db
+                    createRecord (grpName, serverAddr); // subscribe new groups in db
                 }
                 return 0;
             }

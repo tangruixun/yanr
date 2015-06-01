@@ -17,7 +17,7 @@ public class NntpOpHelper {
         nntpclient = new NNTPClientClass();
     }
 
-    NewsGroups retrieveAllGroups (String servername, int port) throws IOException, Exception {
+    NewsGroups retrieveAllGroupsFromServer (String servername, int port) throws IOException, Exception {
         List<String> messageHeaderList = new ArrayList<String>();
         NewsGroups newsgroups = new NewsGroups ();
         

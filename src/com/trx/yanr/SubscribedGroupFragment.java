@@ -32,6 +32,7 @@ public class SubscribedGroupFragment extends Fragment {
     private AllGroupsDbOperator sbscrbdGrpDbOper;
     private String serverName;
     private int port;
+    private String serverAddr = "";
     private Context context;
     Cursor cursor = null;
     Bundle bundle;
@@ -71,6 +72,7 @@ public class SubscribedGroupFragment extends Fragment {
             serverName = getArguments ().getString ("ServerName");
             port = getArguments ().getInt ("Port");
         }
+        serverAddr = serverName + ":" + port;
         sbscrbdGrpDbOper = new AllGroupsDbOperator (getActivity ());
     }
 
@@ -188,7 +190,7 @@ public class SubscribedGroupFragment extends Fragment {
     }
 
     private void refreshGroups () {
-        cursor = sbscrbdGrpDbOper.getGroupCursorByServer (serverName);
+        cursor = sbscrbdGrpDbOper.getSubscribeGroupsCursorByServer (serverAddr);
         Cursor newCursor = cursor;
         subdGrpAdptr.changeCursor (newCursor); // automatically closes old
                                                // Cursor
